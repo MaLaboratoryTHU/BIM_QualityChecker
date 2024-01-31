@@ -1,0 +1,41 @@
+
+�
+#RemoteServiceInterface.protoorg.bimserver.pbServiceInterface.protoAdminInterface.protoMetaInterface.protoSettingsInterface.protoAuthInterface.protoPluginInterface.protoServiceInterface.proto"NotificationInterface.proto"E
+GetPrivateProfilesRequest
+serviceIdentifier (	
+token (	"g
+GetPrivateProfilesResponse
+errorMessage (	3
+value (2$.org.bimserver.pb.SProfileDescriptor"5
+GetPublicProfilesRequest
+serviceIdentifier (	"f
+GetPublicProfilesResponse
+errorMessage (	3
+value (2$.org.bimserver.pb.SProfileDescriptor"�
+NewExtendedDataOnProjectRequest
+poid (
+edid (
+soid (
+serviceIdentifier (	
+profileIdentifier (	
+	userToken (	
+token (	
+apiUrl (	"�
+ NewExtendedDataOnRevisionRequest
+poid (
+roid (
+edid (
+soid (
+serviceIdentifier (	
+profileIdentifier (	
+	userToken (	
+token (	
+apiUrl	 (	2�
+RemoteServiceInterfaceo
+getPrivateProfiles+.org.bimserver.pb.GetPrivateProfilesRequest,.org.bimserver.pb.GetPrivateProfilesResponsel
+getPublicProfiles*.org.bimserver.pb.GetPublicProfilesRequest+.org.bimserver.pb.GetPublicProfilesResponseW
+
+getService#.org.bimserver.pb.GetServiceRequest$.org.bimserver.pb.GetServiceResponsem
+newExtendedDataOnProject1.org.bimserver.pb.NewExtendedDataOnProjectRequest.org.bimserver.pb.VoidResponseo
+newExtendedDataOnRevision2.org.bimserver.pb.NewExtendedDataOnRevisionRequest.org.bimserver.pb.VoidResponseS
+newRevision$.org.bimserver.pb.NewRevisionRequest.org.bimserver.pb.VoidResponseB(B!RemoteServiceInterfaceImplH�

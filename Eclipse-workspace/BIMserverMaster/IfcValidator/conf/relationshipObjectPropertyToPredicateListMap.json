@@ -1,0 +1,11 @@
+{
+"ConnectWith":"ifcowl:relatedElement_IfcRelConnectsElements&ifcowl:relatingElement_IfcRelConnectsElements,ifcowl:relatingElement_IfcRelConnectsElements&ifcowl:relatedElement_IfcRelConnectsElements",
+"RelatingGeometryItem":"ifcowl:representation_IfcProduct&ifcowl:representations_IfcProductRepresentation&list:hasContents&ifcowl:items_IfcRepresentation",
+"RelatingCoordinateSystem":"ifcowl:objectPlacement_IfcProduct",
+"RelatingProperty":"ifcowl:relatedObjects_IfcRelDefines&ifcowl:relatingPropertyDefinition_IfcRelDefinesByProperties&ifcowl:hasProperties_IfcPropertySet",
+"RelativeCoordinateSystem":"ifcowl:placementRelTo_IfcLocalPlacement",
+"ContainedInBuildingStorey":"ifcowl:relatedElements_IfcRelContainedInSpatialStructure&ifcowl:relatingStructure_IfcRelContainedInSpatialStructure",
+"ContainedInBuilding":"ifcowl:relatedObjects_IfcRelDecomposes&ifcowl:relatingObject_IfcRelDecomposes",
+"ContainedInSite":"ifcowl:relatedObjects_IfcRelDecomposes&ifcowl:relatingObject_IfcRelDecomposes",
+"ContainedInProject":"ifcowl:relatedObjects_IfcRelDecomposes&ifcowl:relatingObject_IfcRelDecomposes"
+}

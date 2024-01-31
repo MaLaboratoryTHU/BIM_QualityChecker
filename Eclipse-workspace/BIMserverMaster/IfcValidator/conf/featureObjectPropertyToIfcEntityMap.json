@@ -1,0 +1,6 @@
+{
+"RelatingMaterial":"IfcMaterial",
+"RelatingColour":"IfcColourRgb",
+"RelatingCoordinateSystem":"IfcObjectPlacement",
+"RelatingGeometryItem":"IfcGeometricRepresentationItem"
+}

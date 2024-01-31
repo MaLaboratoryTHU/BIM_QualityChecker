@@ -1,0 +1,187 @@
+<div class="query2">
+	<form style="margin-right: 10px">
+		<div class="form-group">
+			<select class="form-control">
+			</select>
+		</div>
+		<div class="alert errorsDiv ih"></div>
+		<div class="alert alert-info description">Select an example query, or write your own</div>
+		<div class="form-group">
+			<textarea class="form-control queryInp"></textarea>
+		</div>
+		<div class="form-group">
+			<button class="btn btn-primary querySetBtn">Query Set</button>
+			<button class="btn btn-primary queryAddBtn">Query Add</button>
+			<button class="btn btn-primary downloadBtn">Download</button>
+		</div>
+	</form>
+</div>
+<script>
+function Query2(cd, parent) {
+	var o = this;
+	o.roids = [];
+	
+	this.show = function(){
+		cd.show();
+	};
+	
+	this.hide = function(){
+		cd.hide();
+	};
+	
+	cd.find("select").change(function(){
+		var query = o.queries[cd.find("select").val()];
+		cd.find(".description").html(query.description);
+		var json = JSON.stringify(query.query, null, "  ");
+		cd.find("textarea").val(json);
+		o.resize();
+	});
+	
+	this.addRevision = function(project, roid, types){
+		o.schema = project.schema;
+		o.roids.push(roid);
+
+		if (o.examplesLoaded) {
+			return;
+		}
+		
+		if (o.schema == "ifc2x3tc1") {
+			o.queries = queriesIfc2x3tc1;
+		} else if (o.schema == "ifc4") {
+			o.queries = queriesIfc4;
+		}
+		cd.find("select").append("<option>Select a query or create your own</option>");
+		for (var queryKey in o.queries) {
+		    if (o.queries.hasOwnProperty(queryKey)) {
+		    	var option = $("<option>" + queryKey + "</option>");
+		    	cd.find("select").append(option);
+		    }
+		}
+		o.examplesLoaded = true;
+	};
+	
+	this.loadRevision = function(project, roid, types) {
+	};
+	
+	this.unloadRevision = function(poid, roid) {
+	};
+	
+	this.parseJson = function(){
+		cd.find(".errorsDiv").removeClass("alert-danger").html("").hide();
+		
+		try {
+			var jsonObject = JSON.parse(cd.find("textarea").val());
+			return jsonObject;
+		} catch (error) {
+			cd.find(".errorsDiv").addClass("alert-danger").html(error).show();
+			cd.parents(".panel-body").animate({scrollTop:0},0);
+		}
+		return null;
+	};
+	
+	cd.find(".queryAddBtn").click(function(e){
+		e.preventDefault();
+		o.roids.forEach(function(roid){
+			var model = parent.models[roid];
+			if (model != null) {
+				model.reset();
+				var oids = [];
+				var jsonObject = o.parseJson();
+				if (jsonObject == null) {
+					return;
+				}
+				model.query(jsonObject, function(loaded){
+					if (loaded.getType() != "IfcOpeningElement") {
+						oids.push(loaded.oid);
+						loaded.trans.mode = 0;
+					}
+				}).done(function(){
+					parent.setObjectVisibility(roid, oids, 0);
+//				}).error(function(error){
+//					cd.find(".errorsDiv").addClass("alert-danger").html(error).show();
+				});
+			}
+		});
+	});
+
+	cd.find(".downloadBtn").click(function(e){
+		e.preventDefault();
+		var div = $("<div>");
+		$(document.body).append(div);
+		
+		var jsonObject = o.parseJson();
+		if (jsonObject == null) {
+			return;
+		}
+
+		var roids = [];
+		o.roids.forEach(function(roid){
+			if (roid != -1) {
+				roids.push(roid);
+			}
+		});
+		
+		var params = {
+			downloadType: "download",
+			allowCheckouts: false,
+			query: cd.find("textarea").val(),
+			roids: roids
+		};
+		div.load(Global.baseDir + "download.html", function(){
+			new Download($(this), params);
+			div.find(".modal").modal("show");
+		});
+	});
+	
+	cd.find(".querySetBtn").click(function(e){
+		e.preventDefault();
+		o.roids.forEach(function(roid){
+			if (roid != -1) {
+				var model = parent.models[roid];
+				var oldOids = {};
+				for (var oid in model.objects) {
+					oldOids[oid] = true;
+				}
+				if (model != null) {
+					model.reset();
+					var oids = [];
+					var jsonObject = o.parseJson();
+					if (jsonObject == null) {
+						return;
+					}
+					model.query(jsonObject, function(loaded){
+						if (loaded.getType() != "IfcOpeningElement") {
+							oids.push(loaded.oid);
+							delete oldOids[loaded.oid];
+						}
+					}, function(error){
+						cd.find(".errorsDiv").addClass("alert-danger").html(error).show();
+						cd.parents(".panel-body").animate({scrollTop:0},0);
+					}).done(function(){
+						var oldOidsAr = [];
+						for (var oid in oldOids) {
+							oldOidsAr.push(oid);
+						}
+						if (oldOidsAr.length > 0) {
+							parent.setObjectVisibility(roid, oldOidsAr, 2);
+						}
+						parent.setObjectVisibility(roid, oids, 0);
+					});
+				}				
+			}
+		});
+	});
+
+	parent.modelAddedListeners.register(o.addRevision);
+	parent.modelLoadedListeners.register(o.loadRevision);
+	parent.modelUnloadedListeners.register(o.unloadRevision);
+	
+	this.resize = function(){
+		var height = ($(window).height() - $(".navbar").outerHeight() - $(".description").outerHeight() - $(".navbar-header").outerHeight() - $(".navigator .panel-heading").outerHeight() - 200);
+		cd.find(".queryInp").height(height + "px");
+	};
+
+	o.resize();
+	$(window).resize(o.resize);
+}
+</script>

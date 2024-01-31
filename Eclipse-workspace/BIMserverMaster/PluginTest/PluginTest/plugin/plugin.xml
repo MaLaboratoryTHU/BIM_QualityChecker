@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PluginDescriptor>
+	<JavaPlugin>
+		<interfaceClass>org.bimserver.plugins.services.ServicePlugin</interfaceClass>
+		<implementationClass>org.opensourcebim.PluginTest.outerarea.OuterAreaServicePlugin</implementationClass>
+		<description>Another Outer Area Service Plugin</description>
+		<name>Another Outer Area Service</name>
+	</JavaPlugin>
+</PluginDescriptor>

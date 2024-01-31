@@ -1,0 +1,30 @@
+
+�	
+AuthInterface.protoorg.bimserver.pbServiceInterface.protoAdminInterface.protoMetaInterface.protoSettingsInterface.protoAuthInterface.protoPluginInterface.protoServiceInterface.proto"NotificationInterface.proto#RemoteServiceInterface.proto"
+GetAccessMethodRequest"_
+GetAccessMethodResponse
+errorMessage (	.
+value (2.org.bimserver.pb.SAccessMethod"
+IsLoggedInRequest"9
+IsLoggedInResponse
+errorMessage (	
+value ("2
+LoginRequest
+username (	
+password (	"4
+LoginResponse
+errorMessage (	
+value (	"&
+LoginUserTokenRequest
+token (	"=
+LoginUserTokenResponse
+errorMessage (	
+value (	"
+LogoutRequest2�
+AuthInterfacef
+getAccessMethod(.org.bimserver.pb.GetAccessMethodRequest).org.bimserver.pb.GetAccessMethodResponseW
+
+isLoggedIn#.org.bimserver.pb.IsLoggedInRequest$.org.bimserver.pb.IsLoggedInResponseH
+login.org.bimserver.pb.LoginRequest.org.bimserver.pb.LoginResponsec
+loginUserToken'.org.bimserver.pb.LoginUserTokenRequest(.org.bimserver.pb.LoginUserTokenResponseI
+logout.org.bimserver.pb.LogoutRequest.org.bimserver.pb.VoidResponseBBAuthInterfaceImplH�

@@ -1,0 +1,525 @@
+<!doctype html>
+<html>
+<head>
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+<meta content="utf-8" http-equiv="encoding">
+<title>BIMvie.ws</title>
+</head>
+<body style="margin: 0; padding: 0">
+	<div class="indexStatus statusWrapper">
+		<div class="alert status">
+			<div class="message"></div>
+		</div>
+	</div>
+	<div class="my-fluid-container" style="padding: 15px; padding-bottom: 0px; margin-left: auto; margin-right: auto;">
+		<div class="row" style="margin-left: -15px; margin-right: -15px;">
+			<div class="indexcontainer col-md-12" style="padding-left: 20px; padding-right: 20px;">
+				<div
+					style="text-align: center; color: #31708f; background-color: #d9edf7; border-color: #bce8f1; padding: 15px; margin-bottom: 20px; border: 1px solid transparent; border-radius: 4px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.42857143;">
+					Loading BIMviews...</div>
+			</div>
+		</div>
+	</div>
+	<script type="module">
+		/* The following two lines are modified during the build, the imports as defined here work for running BIMvie.ws on a local-dev station within BIMserver */
+		import {BimServerClient} from '../bimserverjavascriptapi/bimserverclient.js';
+		import {BimServerApiPromise} from '../bimserverjavascriptapi/bimserverapipromise.js';
+
+		window.BimServerClient = BimServerClient;
+		window.BimServerApiPromise = BimServerApiPromise;
+
+		window.Global = {};
+
+		// https://github.com/rgrove/lazyload
+		var LazyLoad=function(k){function p(b,a){var g=k.createElement(b),c;for(c in a)a.hasOwnProperty(c)&&g.setAttribute(c,a[c]);return g}function l(b){var a=m[b],c,f;if(a)c=a.callback,f=a.urls,f.shift(),h=0,f.length||(c&&c.call(a.context,a.obj),m[b]=null,n[b].length&&j(b))}function w(){var b=navigator.userAgent;c={async:k.createElement("script").async===!0};(c.webkit=/AppleWebKit\//.test(b))||(c.ie=/MSIE/.test(b))||(c.opera=/Opera/.test(b))||(c.gecko=/Gecko\//.test(b))||(c.unknown=!0)}function j(b,a,g,f,h){var j=
+			function(){l(b)},o=b==="css",q=[],d,i,e,r;c||w();if(a)if(a=typeof a==="string"?[a]:a.concat(),o||c.async||c.gecko||c.opera)n[b].push({urls:a,callback:g,obj:f,context:h});else{d=0;for(i=a.length;d<i;++d)n[b].push({urls:[a[d]],callback:d===i-1?g:null,obj:f,context:h})}if(!m[b]&&(r=m[b]=n[b].shift())){s||(s=k.head||k.getElementsByTagName("head")[0]);a=r.urls;d=0;for(i=a.length;d<i;++d)g=a[d],o?e=c.gecko?p("style"):p("link",{href:g,rel:"stylesheet"}):(e=p("script",{src:g}),e.async=!1),e.className="lazyload",
+			e.setAttribute("charset","utf-8"),c.ie&&!o?e.onreadystatechange=function(){if(/loaded|complete/.test(e.readyState))e.onreadystatechange=null,j()}:o&&(c.gecko||c.webkit)?c.webkit?(r.urls[d]=e.href,t()):(e.innerHTML='@import "'+g+'";',u(e)):e.onload=e.onerror=j,q.push(e);d=0;for(i=q.length;d<i;++d)s.appendChild(q[d])}}function u(b){var a;try{a=!!b.sheet.cssRules}catch(c){h+=1;h<200?setTimeout(function(){u(b)},50):a&&l("css");return}l("css")}function t(){var b=m.css,a;if(b){for(a=v.length;--a>=0;)if(v[a].href===
+			b.urls[0]){l("css");break}h+=1;b&&(h<200?setTimeout(t,50):l("css"))}}var c,s,m={},h=0,n={css:[],js:[]},v=k.styleSheets;return{css:function(b,a,c,f){j("css",b,a,c,f)},js:function(b,a,c,f){j("js",b,a,c,f)}}}(window.document);
+			
+
+		window.Global.baseDir = new String(window.document.location.protocol + "//" + window.document.location.host + window.document.location.pathname);
+		if (window.Global.baseDir.substring(window.Global.baseDir.length - 5) == ".html") {
+			window.Global.baseDir = window.Global.baseDir.substring(0, window.Global.baseDir.lastIndexOf("/"));
+		}
+		if (window.Global.baseDir.substring(window.Global.baseDir.length - 1) != "/") {
+			window.Global.baseDir = window.Global.baseDir + "/";
+		}
+		var baseJsDir = window.Global.baseDir + "js/";
+		var baseCssDir = window.Global.baseDir + "css/";
+		
+//		var base = window.document.getElementsByTagName("base");
+//		base[0].href = window.Global.baseDir;
+
+		function getPluginVersion(address, callback) {
+			var myRequest = new XMLHttpRequest();
+			myRequest.onreadystatechange = function() {
+				if (myRequest.readyState != 4)  {
+					// We are waiting for a readyState 4 here
+					return;
+				}
+				if (myRequest.status != 200)  {
+					callback(new Date().getTime());
+				} else {
+					var version = JSON.parse(myRequest.responseText).version;
+					if (version.endsWith("-SNAPSHOT")) {
+						callback(version + "-" + new Date().getTime());
+					} else {
+						callback(version);
+					}
+				}
+			};
+			myRequest.open("GET", address + "/plugin.version", true);
+			myRequest.send();
+		}
+		
+		function loadBimSurfer() {
+			var p = new Promise((resolve, reject) => {
+	    		if (Settings.useBimSurfer()) {
+	    			getPluginVersion(Settings.getBimSurferApiAddress(), function(apiVersion){
+	    				var jsToLoad = [];
+						if (false) {
+							jsToLoad.push(Settings.getBimSurferApiAddress() + "/bimsurfer.min.js?_v=" + apiVersion);
+						} else {
+			    			jsToLoad = jsToLoad.concat([
+			    	   		    Settings.getBimSurferApiAddress() + "/api/BIMSURFER.js?_v=" + apiVersion, 
+			    	   		 	Settings.getBimSurferApiAddress() + "/lib/hammer/touch-emulator.js?_v=" + apiVersion, 
+			    	   		 	Settings.getBimSurferApiAddress() + "/lib/hammer/hammer.min.js?_v=" + apiVersion, 
+			    	   		 	Settings.getBimSurferApiAddress() + "/lib/scenejs/scenejs.js?_v=" + apiVersion, 
+				    	   		Settings.getBimSurferApiAddress() + "/api/SceneJS.js?_v=" + apiVersion, 
+				    	   		Settings.getBimSurferApiAddress() + "/api/Constants.js?_v=" + apiVersion, 
+				    	   		Settings.getBimSurferApiAddress() + "/api/ProgressLoader.js?_v=" + apiVersion, 
+				    	   		Settings.getBimSurferApiAddress() + "/api/Types/Light.js?_v=" + apiVersion, 
+				    	   		Settings.getBimSurferApiAddress() + "/api/Types/Light/Ambient.js?_v=" + apiVersion, 
+				    	   		Settings.getBimSurferApiAddress() + "/api/Types/Light/Sun.js?_v=" + apiVersion, 
+				    	   		Settings.getBimSurferApiAddress() + "/api/Control.js?_v=" + apiVersion, 
+				    	   		Settings.getBimSurferApiAddress() + "/api/Control/ClickSelect.js?_v=" + apiVersion, 
+				    	   		Settings.getBimSurferApiAddress() + "/api/Control/LayerList.js?_v=" + apiVersion, 
+				    	   		Settings.getBimSurferApiAddress() + "/api/Control/ProgressBar.js?_v=" + apiVersion, 
+				    	   		Settings.getBimSurferApiAddress() + "/api/Control/PickFlyOrbit.js?_v=" + apiVersion, 
+				    	   		Settings.getBimSurferApiAddress() + "/api/Control/ObjectTreeView.js?_v=" + apiVersion, 
+				    	   		Settings.getBimSurferApiAddress() + "/api/Events.js?_v=" + apiVersion, 
+				    	   		Settings.getBimSurferApiAddress() + "/api/StringView.js?_v=" + apiVersion, 
+				    	   		Settings.getBimSurferApiAddress() + "/api/GeometryLoader.js?_v=" + apiVersion, 
+				    	   		Settings.getBimSurferApiAddress() + "/api/AsyncStream.js?_v=" + apiVersion, 
+				    	   		Settings.getBimSurferApiAddress() + "/api/DataInputStream.js?_v=" + apiVersion, 
+				    	   		Settings.getBimSurferApiAddress() + "/api/Viewer.js?_v=" + apiVersion, 
+				    	   		Settings.getBimSurferApiAddress() + "/api/Util.js?_v=" + apiVersion
+			       			]);
+						}
+						LazyLoad.js(jsToLoad, () => {
+							resolve();
+						});
+	    			});
+	    		} else {
+	    			callback();
+	    		}
+			});
+			return p;
+		}
+
+		function loadBimServerApi(apiAddress) {
+//			var useDynamicLoading = false;
+//			if (useDynamicLoading) {
+//				getPluginVersion(apiAddress, function(apiVersion){
+//					Promise.all([
+//						Settings.getBimServerApiAddress() + "/bimserverclient.js",
+//						Settings.getBimServerApiAddress() + "/bimserverapipromise.js"
+//					].map(x => import(x)))
+//					.then(([BimServerClient, BimServerApiPromise]) => {
+//						bimserverapi.BimServerClient = BimServerClient.BimServerClient;
+//						bimserverapi.BimServerApiPromise = BimServerApiPromise.BimServerApiPromise;
+//	 					callback();
+//					});
+//				});
+//			} else {
+				// This loads the transpiled version for now. When EcmaScript 6 modules work on recent browsers without special settings, should switch to real modules (be it dynamic or static)
+			var p = new Promise((resolve, reject) => {
+//				if (Settings.useCompressedResources()) {
+//					getPluginVersion(apiAddress, function(apiVersion){
+//						LazyLoad.js([Settings.getBimServerApiAddress() + "/bimserverapi.umd.js?_v=" + apiVersion], function(){
+//							if (bimserverapi == null) {
+//								throw "Error loading BIMserver API from UMD";
+//							}
+//							window.BimServerClient = bimserverapi.default;
+//							window.BimServerApiPromise = bimserverapi.BimServerApiPromise;
+//							
+							resolve();
+//						});
+//					});
+//				} else {
+//					getPluginVersion(apiAddress, function(apiVersion){
+						// Using eval here, so we don't trip the browsers that don't understand "import"
+						// The reason for using it this way is so we can develop this library and test it without having to transpile.
+						// Obviously developers need to have a browser that understands "import" (i.e. a recent version of Chrome, Firefox etc...)
+						
+						// TODO One remaining problem here is that dependencies are not loaded with the "apiVersion" attached, so you need to have your browser on "clear cache" all the time
+						//var str = "import(Settings.getBimServerApiAddress() + \"/bimserverclient.js?_v=" + apiVersion + "\").then((bimserverapi) => {	window.BimServerClient = bimserverapi.default; window.BimServerApiPromise = bimserverapi.BimServerApiPromise; resolve();});";
+						//eval(str);
+//						resolve();
+//					});
+//				}
+			});
+			return p;
+		}
+
+		function loadBimViews(callback) {
+			var p = new Promise((resolve, reject) => {
+				var jsToLoad = [];
+				if (Settings.useCompressedResources()) {
+					var jsToLoad = [baseJsDir + "bimviews.js?_v=" + Global.version];
+				} else {
+					var jsToLoad = [
+		        		baseJsDir + "jquery-2.2.0.js?_v=" + Global.version, 
+		       		    baseJsDir + "main.js?_v=" + Global.version, 
+		       		    baseJsDir + "history.js?_v=" + Global.version, 
+		       		    baseJsDir + "history.adapter.jquery.js?_v=" + Global.version, 
+		       		    baseJsDir + "jquery.cookie.js?_v=" + Global.version, 
+		       		    baseJsDir + "jquery.numeric.js?_v=" + Global.version, 
+		       		    baseJsDir + "jquery.enterpress.js?_v=" + Global.version, 
+		       		    baseJsDir + "jquery.dragbetter.js?_v=" + Global.version, 
+		       		    baseJsDir + "base64unicode.js?_v=" + Global.version, 
+		       		    baseJsDir + "jquery.ui.widget.js?_v=" + Global.version, 
+		       		    baseJsDir + "String.js?_v=" + Global.version, 
+		       		    baseJsDir + "examplequeries.js?_v=" + Global.version, 
+		       		    baseJsDir + "tree.js?_v=" + Global.version, 
+		       		    baseJsDir + "bootstrap.js?_v=" + Global.version, 
+		       		    baseJsDir + "Variable.js?_v=" + Global.version, 
+		       		    baseJsDir + "EventRegistry.js?_v=" + Global.version, 
+		       		    baseJsDir + "sha256.js?_v=" + Global.version, 
+		       		    baseJsDir + "utils.js?_v=" + Global.version, 
+		       		    baseJsDir + "formatters.js?_v=" + Global.version, 
+		       		    baseJsDir + "Chart.bundle.js?_v=" + Global.version, 
+		       		    baseJsDir + "jquery.scrollTo.js?_v=" + Global.version, 
+		       		    baseJsDir + "pagechanger.js?_v=" + Global.version, 
+		       		    baseJsDir + "plugins/pluginmanager.js?_v=" + Global.version, 
+		       		    baseJsDir + "plugins/relaticsplugin.js?_v=" + Global.version,
+		       		    baseJsDir + "papaparse.min.js?_v=" + Global.version
+		    	 	];
+				}
+				LazyLoad.js(jsToLoad, () => {
+					resolve();
+				});				
+			});
+			return p;
+		}
+		
+		function loadResources() {
+			(function() {
+			    var link = window.document.createElement('link');
+			    link.type = 'image/x-icon';
+			    link.rel = 'shortcut icon';
+			    link.href = Global.baseDir + 'img/logo_small.png';
+			    window.document.getElementsByTagName('head')[0].appendChild(link);
+			}());
+			
+			if (Settings.useCompressedResources()) {
+				var cssToLoad = [baseCssDir + "bimviews.min.css?_v=" + Global.version];
+			} else {
+				var cssToLoad = [
+	 			    baseCssDir + "bootstrap.css?_v=" + Global.version, 
+				    baseCssDir + "main.css?_v=" + Global.version, 
+				    baseCssDir + "bootstrap-vert-tabs.css?_v=" + Global.version, 
+				    baseCssDir + "magic-bootstrap-min.css?_v=" + Global.version
+				];
+			}
+			LazyLoad.css(cssToLoad, function(){});
+
+			var initialJs = [];
+
+			var p1 = loadBimServerApi(Settings.getBimServerApiAddress());
+			var p2 = loadBimViews();
+			var p3 = loadBimSurfer();
+			Promise.all([p1, p2, p3]).then(() => {
+		    			Global.lastKey = null;
+
+		    			$.ajaxSetup({
+		    				cache: true
+		    			});
+
+		    			if (Settings.useBimSurfer()) {
+			    			SceneJS.configure({ pluginPath: Settings.getBimSurferApiAddress() + "/lib/scenejs/plugins", statusPopups: false});
+		    			}
+		    			
+		    			var jQueryLoad = $.fn.load;
+		    			$.fn.load = function(url, params, callback) {
+		    				url += "?_v=" + Global.version;
+	    			        return jQueryLoad.apply(this, arguments);
+		    			}
+		    			
+		    			$("body").on("keyup", function (e) {
+		    				if (e.target.nodeName == "BODY") {
+		    					if (e.keyCode == 67 && Global.lastKey == 67 && !e.ctrlKey) {
+		    						console.log("Clearing cookies");
+		    						$.removeCookie("address" + window.window.document.location.port, {});
+		    						$.removeCookie("username" + window.window.document.location.port, {});
+		    						$.removeCookie("autologin" + window.window.document.location.port, {});
+		    						Global.lastKey = null;
+		    					} else {
+		    						Global.lastKey = e.keyCode;
+		    					}
+		    				}
+		    			});
+		    			
+		    			Global.loadBimServerApiFromAddress = function(address, successFunction, errorFunction){
+		    				if (address.endsWith("/")) {
+		    					address = address.substring(0, address.length - 1);
+		    				}
+		    				if (BimServerClient != null) {
+		    					Global.bimServerApi = new BimServerClient(address, Global.notifier);
+		    					Global.bimServerApi.init(function(api, serverInfo){
+			    					if (serverInfo.serverState == "NOT_SETUP") {
+			    						$(".indexcontainer").load(Global.baseDir + "setup.html", function(){
+			    							new Setup(address);
+			    						});
+			    					} else if (serverInfo.serverState == "UNDEFINED") {
+			    					} else if (serverInfo.serverState == "MIGRATION_REQUIRED") {
+			    						$(".indexcontainer").load(Global.baseDir + "migrate.html", function(){
+			    							new Migrate(address);
+			    						});
+			    					} else if (serverInfo.serverState == "MIGRATION_IMPOSSIBLE") {
+			    					} else if (serverInfo.serverState == "FATAL_ERROR") {
+			    					} else if (serverInfo.serverState == "RUNNING") {
+			    						successFunction(address);
+			    					}
+		    					});
+		    				} else {
+		    					Global.notifier.setError("Could not find BIMserver API");
+//		    					if (errorCallback != null) {
+//		    						errorCallback();
+//		    					}
+		    				}
+		    			};
+		    			
+	function getApiAddress() {
+		var pathname = document.location.pathname;
+		if (pathname.length > 14 && pathname.substring(pathname.length - 15) == "/apps/bimviews/") {
+			// We assume that BIMvie.ws is being served from a BIMserver and that this is also the BIMserver we would like to connect to
+			const href = document.location.href; 
+			return href.substring(0, href.indexOf("/apps/bimviews/"));
+		} else {
+			// Return a default
+			console.log(document.location);
+			return "http://localhost:8080";
+		}
+	}		    			
+
+		    			function load() {
+		    				$(".sidespan").empty();
+		    				Global.history = pushInitialState();
+		    				var notLoggedInFunction = function(address){
+		    					if (Global.history.page == "Login") {
+		    						$(".indexcontainer").load(Global.baseDir + "login.html", function(){
+		    							Global.current = new Login(address);
+		    						});
+		    					} else if (Global.history.page == "SelectServer") {
+		    						$(".indexcontainer").load(Global.baseDir + "selectserver.html", function(){
+		    							Global.current = new SelectServer(null);
+		    						});
+		    					} else if (Global.history.page == "Register") {
+		    						$(".indexcontainer").load(Global.baseDir + "register.html", function(){
+		    							Global.current = new Register($(this));
+		    						});
+		    					} else if (Global.history.page == "ResetPassword") {
+		    						$(".indexcontainer").load(Global.baseDir + "resetpassword.html", function(){
+		    							Global.current = new ResetPassword($(this), null);
+		    						});
+		    					} else {
+		    						$(".indexcontainer").load(Global.baseDir + "login.html", function(){
+		    							Global.current = new Login(address, null, window.location.href);
+		    						});
+		    					}
+		    				};
+		    				
+		    				var successFunction = function(address){
+		    					// We do have an API
+		    					var token = getParameterByName("token");
+		    					if (token == null) {
+		    						token = $.cookie("autologin" + window.window.document.location.port);
+		    					}
+		    					if (token != null) {
+		    						Global.bimServerApi.setToken(token, function(){
+										$.cookie("autologin" + window.document.location.port, token, { });
+										$.cookie("address" + window.document.location.port, address, { });
+		    							$(".indexcontainer").load(Global.baseDir + "main.html", function(){
+		    								$(".indexStatus").hide();
+		    								Global.current = new Main(Global.bimServerApi.baseUrl, Global.bimServerApi.user).show(false);
+		    							});
+		    						}, function(){
+		    							$.removeCookie("autologin" + window.window.document.location.port);
+		    							Global.bimServerApi.token = null;
+		    							notLoggedInFunction(address);
+		    						});
+		    					} else {
+		    						notLoggedInFunction(address);
+		    					}
+		    				};
+		    				
+		    				var errorFunction = function(){
+		    					$.removeCookie("username" + window.window.document.location.port, {});
+		    					$.removeCookie("autologin" + window.window.document.location.port, {});
+		    					$.removeCookie("address" + window.window.document.location.port, {});
+		    				};
+
+		    				var address = getParameterByName("api_address");
+		    				
+		    				if (address != null) {
+		    					Global.loadBimServerApiFromAddress(address, successFunction, errorFunction);
+		    				} else if ($.cookie("address" + window.window.document.location.port) != null) {
+		    					Global.loadBimServerApiFromAddress($.cookie("address" + window.window.document.location.port), successFunction, errorFunction);
+		    				} else if (!Settings.allowBimServerAddress()) {
+								var address = getApiAddress();
+	    						if (address != null) {
+	    							Global.loadBimServerApiFromAddress(address, successFunction, errorFunction);
+	    						} else {
+	    							notLoggedInFunction(address);
+	    							$(".indexcontainer").load(Global.baseDir + "selectserver.html", function(){
+	    								new SelectServer();
+	    							});
+	    						}
+		    				} else {
+		    					// NO API
+		    					$(".indexcontainer").load(Global.baseDir + "selectserver.html", function(){
+		    						new SelectServer();
+		    					});
+		    				}
+		    			}
+		    			
+		    			History.Adapter.bind(window, "statechange", function(){
+		    				if (!pushing) {
+		    					load();
+		    				}
+		    		    });
+
+		    			Global.bimServerApi = null;
+		    			Global.objectcache = {};
+		    			Global.timeoutId;
+		    			
+		    			function Notifier() {
+		    				var othis = this;
+		    				
+		    				this.setSelector = function(selector) {
+		    					var currentmessage = $(othis.selector).find(".message").html();
+		    					$(othis.selector).hide();
+		    					othis.selector = selector;
+		    					if (currentmessage != "" && currentmessage != undefined) {
+		    						$(selector).show();
+		    						$(selector).find(".message").html(currentmessage).parent().addClass("alert-success");
+		    					} else {
+		    						$(othis.selector).hide();
+		    					}
+		    					$(othis.selector).find(".close").click(othis.clear);
+		    				};
+
+		    				this.clear = function() {
+		    					$(othis.selector).find(".message").html("").parent().hide();
+		    				};
+
+		    				this.resetStatus = function(){
+		    					if (othis.lastTimeOut != null) {
+		    						clearTimeout(othis.lastTimeOut);
+		    						othis.lastTimeOut = null;
+		    					}
+		    					$(othis.selector).stop(true, true);
+		    					$(othis.selector).fadeOut(1000);
+		    				};
+
+		    				this.resetStatusQuick = function(){
+		    					if (othis.lastTimeOut != null) {
+		    						clearTimeout(othis.lastTimeOut);
+		    						othis.lastTimeOut = null;
+		    					}
+		    					$(othis.selector).hide();
+		    				};
+
+		    				this.setSuccess = function(status, timeToShow) {
+		    					if (timeToShow == null) {
+		    						timeToShow = 5000;
+		    					}
+		    					$(othis.selector).stop(true, true);
+		    					if (othis.lastTimeOut != null) {
+		    						clearTimeout(othis.lastTimeOut);
+		    						othis.lastTimeOut = null;
+		    					}
+		    					$(othis.selector).find(".message").html(status).parent().removeClass("initialhide").removeClass("alert-danger").removeClass("alert-info").addClass("alert-success").show();
+		    					var notifier = this;
+		    					if (timeToShow != -1) {
+		    						othis.lastTimeOut = setTimeout(function(){
+		    							notifier.resetStatus();
+		    						}, timeToShow);
+		    					}
+		    				};
+		    				
+		    				this.setInfo = function(status, timeToShow) {
+		    					if (timeToShow == null) {
+		    						timeToShow = 5000;
+		    					}
+		    					$(othis.selector).stop(true, true);
+		    					if (othis.lastTimeOut != null) {
+		    						clearTimeout(othis.lastTimeOut);
+		    						othis.lastTimeOut = null;
+		    					}
+		    					$(othis.selector).find(".message").html(status).parent().show().removeClass("alert-danger").removeClass("alert-success").addClass("alert-info");
+		    					var notifier = this;
+		    					if (timeToShow != -1) {
+		    						othis.lastTimeOut = setTimeout(function(){
+		    							notifier.resetStatus();
+		    						}, timeToShow);
+		    					}
+		    				};
+
+		    				this.setError = function(error) {
+		    					if (othis.lastTimeOut != null) {
+		    						clearTimeout(othis.lastTimeOut);
+		    						othis.lastTimeOut = null;
+		    					}
+		    					$(othis.selector).find(".message").html(error).parent().removeClass("alert-info").removeClass("alert-success").addClass("alert-danger").show();
+		    				};
+		    				
+		    				othis.setSelector(".indexStatus .status");
+		    			}
+
+		    			Global.notifier = new Notifier();
+
+		    			function loadError() {
+		    				window.clearTimeout(Global.timeoutId);
+		    				Global.notifier.error("Could not connect");
+		    				$.removeCookie("username" + window.window.document.location.port, {});
+		    				$.removeCookie("autologin" + window.window.document.location.port, {});
+		    				$.removeCookie("address" + window.window.document.location.port, {});
+		    				$(".indexcontainer").load(Global.baseDir + "login.html", function(){
+		    					new Login();
+		    				});
+		    			}
+		    			
+		    			setInterval(function() {
+		    				var now = new Date().getTime();
+		    				$(".timespan").each(function() {
+		    					$(this).html(formatTimeSpan(now - $(this).attr("datetime"), false));
+		    				});
+		    				$(".duration").each(function() {
+		    					var start = new Date(parseInt($(this).attr("start")));
+		    					var end = $(this).attr("end") == null ? new Date() : new Date(parseInt($(this).attr("end")));
+		    					var diff = end.getTime() - start.getTime();
+		    					$(this).html(formatDuration(diff, true));
+		    				});
+		    			}, 1000);
+
+		    			load();
+		    		}, function (err) {
+		    			console.log(err);
+		    		});	
+		}
+
+		// Settings.js is never cached
+		LazyLoad.js([baseJsDir + "settings.js?_v=" + new Date().getTime()], function(){
+			Settings.getVersion(function(version){
+				if (version.endsWith("-SNAPSHOT")) {
+					version = version + "-" + new Date().getTime();
+				}
+				Global.version = version;
+				loadResources();
+			});
+		});
+	</script>
+</body>
+</html>

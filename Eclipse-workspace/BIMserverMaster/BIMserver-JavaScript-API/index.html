@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+<head>
+</head>
+<h1>BIMserver JavaScript API</h1>
+
+<p>
+To make it easier to interact with the OpenSource BIMserver from a web environment (like a browser or NodeJS) you can use this library.
+This library uses the ECMAScript6 Modules concept. Not all browsers support this yet.
+</p>
+
+<h3>Caching</h3>
+<p>
+The "?_v=%VERSION%" additions are there for efficient caching purposes. Any server system serving these files can tell the client to cache these files indefinitely.
+</p>
+
+<h3>Links</h3>
+<ul>
+	<li><a href="bimserverapipromise.js?_v=%VERSION%">bimserverapipromise.js?_v=%VERSION%</a></li>
+	<li><a href="bimserverapiwebsocket.js?_v=%VERSION%">bimserverapiwebsocket.js?_v=%VERSION%</a></li>
+	<li><a href="bimserverclient.js?_v=%VERSION%">bimserverclient.js?_v=%VERSION%</a></li>
+	<li><a href="ifc2x3tc1.js?_v=%VERSION%">ifc2x3tc1.js?_v=%VERSION%</a></li>
+	<li><a href="ifc4.js?_v=%VERSION%">ifc4.js?_v=%VERSION%</a></li>
+	<li><a href="model.js?_v=%VERSION%">model.js?_v=%VERSION%</a></li>
+	<li><a href="translations_en.js?_v=%VERSION%">translations_en.js?_v=%VERSION%</a></li>
+</ul>
+
+To include this library in your project, copy this to your <pre>&lt;head&gt;</pre>
+<pre>
+&lt;script type="module" src="bimserverapipromise.js?_v=%VERSION%"&gt;&lt;/script&gt;
+&lt;script type="module" src="bimserverapiwebsocket.js?_v=%VERSION%"&gt;&lt;/script&gt;
+&lt;script type="module" src="bimserverclient.js?_v=%VERSION%"&gt;&lt;/script&gt;
+&lt;script type="module" src="ifc2x3tc1.js?_v=%VERSION%"&gt;&lt;/script&gt;
+&lt;script type="module" src="ifc4.js?_v=%VERSION%"&gt;&lt;/script&gt;
+&lt;script type="module" src="model.js?_v=%VERSION%"&gt;&lt;/script&gt;
+&lt;script type="module" src="translations_en.js?_v=%VERSION%"&gt;&lt;/script&gt;
+</pre>
+
+Combined minified version (only available on a released version):
+
+<a href="bimserverapi.js?_v=%VERSION%">bimserverapi.js?_v=%VERSION%</a>
+
+<h1>Static import example</h1>
+<pre>
+// Import the library, all dependencies will be handled by the module system
+import BimServerClient from './bimserverclient.js';
+
+// Create a new API, the path given should point to the base path of a BIMserver. This can also be a full URL like "http://bimserveraddress"
+var api = new BimServerClient("../..");
+api.init((client, version) => {
+	console.log(version.version);
+});
+</pre>
+
+<h1>Dynamic import example</h1>
+<pre>
+	// When the location on the API is not known in advance, you can use dynamic loading, in most browsers you'll need to use a "dev" version for this to work (Chrome 64 for example).
+	var address = "http://addressofapi";
+	Promise.all([
+		address + "/bimserverclient.js",
+		address + "/bimserverapipromise.js"
+	].map(x => import(x)))
+	.then(([BimServerClient, BimServerApiPromise]) => {
+		var api = new BimServerClient.BimServerClient("../..");
+		api.init((client, version) => {
+			document.getElementById("version").innerHTML = JSON.stringify(version.version, 0, 2);
+		});
+	});
+</pre>
+
+<h1>(Live) Version returned from local BIMserver</h1>
+<pre id="version">
+</pre>
+
+<script type="module">
+import BimServerClient from './bimserverclient.js';
+var api = new BimServerClient("../..");
+api.init((client, version) => {
+	document.getElementById("version").innerHTML = JSON.stringify(version.version, 0, 2);
+});
+</script>
+</html>

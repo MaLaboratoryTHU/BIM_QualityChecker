@@ -1,0 +1,169 @@
+<div class="availablepluginbundles">
+	<div class="alert alert-success ih">
+		Plugin successfully installed, <a class="btnBack">Back to available plugins</a>
+	</div>
+	<h3>Available Plugin Bundles <a class="helpBtn" title="Help"><span class="glyphicon glyphicon-question-sign"></span></a></h3>
+	<div class="panel panel-default helpDiv ih">
+  		<div class="panel-body">
+			<p><b>Only non-installed</b> Only plugin bundles are shown that have no installed versions on this BIMserver. To update installed plugins, goto <a class="installedPluginsBtn">Installed Plugin Bundles</a>.</p>
+			<p><b>Repository</b> Plugins are discovered by connecting to a repository, you can change the repository in <a class="btnServerSettings">Server Settings</a></p>
+			<p><b>Strict checking</b> By default, all plugins have to explicitly indicate with which versions of BIMserver they work. Sometimes this information is not accurate and you still want to load a certain plugin. You can go to <a class="btnServerSettings">Server Settings</a> and disable "Strict plugin checking"."
+			<p><b>Untested</b> This means the version of the plugin has not been tested with this version of BIMserver</p> 
+		</div>
+	</div>
+	<div class="none ih">
+		No plugins available on this repository that have not already been installed
+	</div>
+	<table class="table ih availableTable">
+		<thead>
+			<tr>
+				<th></th>
+				<th>Name</th>
+				<th>Organization</th>
+				<th>Description</th>
+				<th>Version</th>
+				<th>Date/Time</th>
+				<th>Install</th>
+			</tr>
+		</thead>
+		<tbody></tbody>
+	</table>
+	<a class="installFromUrlOrFile">Install from URL or File</a>
+	<div class="installFromUrlOrFileDiv well ih">
+		File: <input type="file" class="form-control fileInput"/><br/>
+		-- OR --<br/>
+		URL: <input type="text" class="form-control urlInput"/><br/>
+		<button class="btn btn-primary installBtn">Install</button>
+	</div>
+</div>
+<script>
+function AvailablePluginBundles(main, serverSettings, cd) {
+	var o = this;
+	
+	this.show = function(){};
+	this.hide = function(){};
+	
+	Global.bimServerApi.callWithFullIndication("PluginInterface", "getAvailablePluginBundles", {}, function(data){
+		cd.find("table tbody tr").remove();
+		if (data.length == 0) {
+			cd.find(".none").show();
+			cd.find("table").hide();
+		} else {
+			cd.find("table").show();
+		}
+		data.forEach(function(pluginBundle){
+			var tr = $("<tr>");
+			
+			var latest = pluginBundle.latestVersion;
+			
+			var iconTd = $("<td>");
+			if (latest.icon != null) {
+				var icon = $("<img style=\"width: 16px; height: 16px\">");
+				icon.attr("src", "data:image/png;base64," + latest.icon);
+				iconTd.append(icon);
+			}
+			tr.append(iconTd);
+			tr.append("<td>" + pluginBundle.name + "</td>");
+			tr.append("<td>" + pluginBundle.organization + "</td>");
+			tr.append("<td>" + latest.description + "</td>");
+			
+			var versionTd = $("<td>");
+			var versionSelect = $("<select class=\"form-control\">");
+			versionTd.append(versionSelect);
+			pluginBundle.availableVersions.forEach(function(version){
+				var text = version.version;
+				if (version.version == latest.version) {
+					text += " (latest)";
+				}
+				if (version.mismatch) {
+					text += " (UNTESTED)";
+				}
+				var option = $("<option val=\"" + version.version + "\">" + text + "</option>");
+				option.data("version", version);
+				versionSelect.append(option);
+			});
+			
+			versionSelect.find("option").first().attr("selected", "selected");
+
+			versionSelect.change(function(){
+				var version = $(this).find(":selected").data("version");
+				tr.data("version", version);
+			});
+			
+			tr.data("pluginBundle", pluginBundle);
+			tr.data("version", pluginBundle.latestVersion);
+			
+			tr.append(versionTd);
+			if (latest.date != null) {
+				tr.append("<td>" + formatDateTime(new Date(latest.date)) + "</td>")
+			} else {
+				tr.append("<td>Unknown</td>");
+			}
+
+			var installTd = $("<td>");
+			var installBtn = $("<button class=\"btn btn-primary\">Install</button>");
+			installBtn.click(function(){
+				var tr = $(this).parents("tr");
+				var pluginBundle = tr.data("pluginBundle");
+				var version = tr.data("version");
+				serverSettings.showInstallPluginBundle(pluginBundle, version);
+			});
+			installTd.append(installBtn);
+			tr.append(installTd);
+
+			cd.find("table tbody").append(tr);
+		});
+	});
+	
+	cd.find(".helpBtn").click(function(){
+		cd.find(".helpDiv").toggle();
+	});
+	
+	cd.find(".installFromUrlOrFile").click(function(){
+		cd.find(".installFromUrlOrFileDiv").show();
+		cd.find(".availableTable").hide();
+		cd.find(".installFromUrlOrFile").hide();
+	});
+	
+	cd.find(".installedPluginsBtn").click(serverSettings.showInstalledPluginBundles);
+	cd.find(".btnServerSettings").click(serverSettings.showBasicServerSettings);
+	
+	cd.find(".installBtn").click(function(){
+		if (cd.find(".urlInput").val() != null && cd.find(".urlInput").val() != "") {
+			Global.bimServerApi.callWithFullIndication("PluginInterface", "installPluginBundleFromUrl", {
+				url: cd.find(".urlInput").val(),
+				installAllPluginsForAllUsers: true,
+				installAllPluginsForNewUsers: true
+			}, function(){
+				cd.find(".alert-success").show();
+				cd.find(".installBtn").hide();
+				window.scrollTo(0, 0);
+			});
+		} else {
+			var reader  = new FileReader();
+
+			reader.addEventListener("load", function () {
+				var base64 = reader.result.substring(reader.result.indexOf(",") + 1);
+				Global.bimServerApi.callWithFullIndication("PluginInterface", "installPluginBundleFromFile", {
+					data: base64,
+					installAllPluginsForAllUsers: true,
+					installAllPluginsForNewUsers: true
+				}, function(){
+					cd.find(".alert-success").show();
+					cd.find(".installBtn").hide();
+					window.scrollTo(0, 0);
+				});
+			}, false);
+
+			var file = cd.find(".fileInput").get(0).files[0];
+			if (file) {
+			    reader.readAsDataURL(file);
+			}
+		}
+	});
+	
+	cd.find(".btnBack").click(function(){
+		serverSettings.showAvailablePluginBundles();
+	});
+}
+</script>

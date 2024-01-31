@@ -1,0 +1,58 @@
+{
+  "name": "bimserverapi",
+  "groupId": "org.opensourcebim",
+  "artifactId": "javascriptapi",
+  "organization": "OpenSource BIM",
+  "version": "0.0.167",
+  "description": "A JavaScript API for the OpenSource BIMserver",
+  "author": {
+    "name": "Ruben de Laat",
+    "email": "ruben@logic-labs.nl"
+  },
+  "scripts": {
+    "build": "rollup -c"
+  },
+  "files": [
+    "*.js"
+  ],
+  "main": "build/bimserverapi.js",
+  "module": "bimserverclient.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/opensourceBIM/BIMserver-JavaScript-API"
+  },
+  "bugs": {
+    "url": "https://github.com/opensourceBIM/BIMserver-JavaScript-API/issues"
+  },
+  "keywords": [],
+  "browser": {
+    "xhr2": false,
+    "websocket": false
+  },
+  "dependencies": {
+    "websocket": "*",
+    "xhr2": "*"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-preset-env": "^1.6.1",
+    "grunt": "*",
+    "grunt-contrib-concat": "*",
+    "grunt-contrib-jshint": "*",
+    "grunt-contrib-nodeunit": "*",
+    "grunt-contrib-uglify": "*",
+    "grunt-zip": "*",
+    "rollup": "^0.50.0",
+    "rollup-plugin-babel": "^3.0.2",
+    "rollup-plugin-commonjs": "^8.2.6",
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "rollup-plugin-uglify": "^2.0.1"
+  },
+  "preferGlobal": true,
+  "private": false,
+  "analyze": true,
+  "license": "AGPL-3.0",
+  "readmeFilename": "README.md",
+  "tonicExampleFilename": "tonicExample.js"
+}

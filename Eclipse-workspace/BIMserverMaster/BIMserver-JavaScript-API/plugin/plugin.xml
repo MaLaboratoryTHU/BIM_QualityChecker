@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PluginDescriptor>
+	<WebModulePlugin>
+		<identifier>bimserverjavascriptapi</identifier>
+		<name>BIMserver JavaScript API</name>
+		<description>JavaScript API for BIMserver</description>
+	</WebModulePlugin>
+</PluginDescriptor>

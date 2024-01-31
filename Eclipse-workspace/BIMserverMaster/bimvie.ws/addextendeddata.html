@@ -1,0 +1,168 @@
+<div class="addextendeddata">
+	<div class="modal fade" tabindex="-1" role="dialog">
+		<div class="modal-dialog" role="document">
+	   	   	<div class="modal-content">	
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true">&times;</button>
+					<h4 class="modal-title">Add extended data</h4>
+				</div>
+				<input id="file" class="form-control file" type="file" name="data"/>
+				<div class="modal-body">
+					<div class="uploads">
+						<div class="upload">
+							<div class="uploadStatus"></div>
+							<div class="progressBarHolder"></div>
+							<table class="uploadTable">
+								<tr><td><label for="file">File</label></td>
+								<td>
+									<div class="uploadarea well">
+										<p>Drag and drop your file here, or <button class="btn btn-primary chooseFileButton">Choose File</button></p>
+										<div class="uploadMessages">
+											<span class="fileSize ih">Selected file: <span class="name"></span> (<span class="size"></span>)</span>
+										</div>
+									</div>
+								</td></tr>
+								<tr><td><label for="schemaSelect">Schema</label></td><td><select id="schemaSelect" class="schemaSelect form-control"></select></td></tr>
+								<tr><td><label for="title">Title</label></td><td><input type="text" id="title" class="title form-control"/></td></tr>
+							</table>
+						</div>
+					</div>
+				</div>
+			  	<div class="modal-footer">
+			    	<a class="btn btn-default" data-dismiss="modal">Close</a>
+			    	<a class="btn uploadButton btn-primary">Add extended data</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+var lastVal = "";
+
+function AddExtendedData(cd, revision, successFunction) {
+	var othis = this;
+
+	othis.schemas = {};
+	
+	var submitdata = null;
+	var shouldsend = false;
+	var currentCheckinId = null;
+	var fileselected = false;
+
+	this.processFiles = function(files) {
+		othis.validFile = false;
+		for (var i = 0, file; file = files[i]; i++) {
+			othis.file = file;
+			
+			fileselected = true;
+			
+			var size = othis.file.size;
+			var name = othis.file.name;
+			othis.validFile = true;
+			cd.find(".uploadMessages *").hide();
+			cd.find(".uploadMessages .fileSize").show();
+			cd.find(".uploadMessages .fileSize .name").html(name).show();
+			cd.find(".uploadMessages .fileSize .size").html(bytesToSize(size)).show();
+			break;
+		}
+		othis.updateSubmitButton();
+	};
+
+	this.updateSubmitButton = function() {
+        if (fileselected) {
+        	cd.find(".uploadButton").show();
+        } else {
+        	cd.find(".uploadButton").hide();
+        }
+	};
+	
+	this.hideUpload = function() {
+		cd.find(".uploadTable").hide();
+		cd.find(".uploadProgressBar").show();
+		cd.find(".uploadButton").hide();
+		cd.find(".uploadStatus").show();
+	};
+
+	this.showUpload = function() {
+		cd.find(".uploadTable").show();
+		cd.find(".uploadProgressBar").hide();
+		cd.find(".uploadButton").show();
+	};
+	
+	cd.find('.uploadarea, .uploadarea *').on('dragover', function(e) {
+		e.preventDefault();
+		e.stopPropagation();
+	});
+
+	cd.find('.uploadarea').on('dragbetterenter', function(e) {
+		cd.find(".uploadarea").css("background-color", "#EEEEEE");
+		e.preventDefault();
+		e.stopPropagation();
+	});
+
+	cd.find('.uploadarea').on("dragbetterleave", function(e) {
+		cd.find(".uploadarea").removeAttr("style");
+		e.preventDefault();
+		e.stopPropagation();
+	});
+	
+	cd.find('.uploadarea').on("drop", function(e) {
+		othis.processFiles(e.originalEvent.dataTransfer.files);
+		e.preventDefault();
+	});
+	
+	this.uploadNew = function(project){
+		if ($(".addextendeddata .schemaSelect").val() == null) {
+			Global.notifier.setError("No schema selected");
+			return;
+		}
+
+		window.onbeforeunload = function() {
+			return "You are uploading a model, if you close your browser/tab now, it will not continue";
+		}
+
+		othis.hideUpload();
+		
+		cd.find(".uploadStatus").html("Uploading...").show();
+		
+		var title = cd.find(".addextendeddata .title").val();
+		var schema = othis.schemas[cd.find(".addextendeddata .schemaSelect").val()];
+		Global.bimServerApi.addExtendedData(revision.oid, title, schema, othis.file, function(checkinId){
+			window.onbeforeunload = null;
+
+			successFunction();
+			cd.find(".uploadStatus").html("<div class=\"alert alert-block alert-info\">Done</div>");
+		}, function(exception){
+			window.onbeforeunload = null;
+
+			cd.find(".uploadStatus").html("<div class=\"alert alert-block alert-danger\">" + exception.message + "</div>");
+			othis.showUpload();
+		});
+	};
+
+	cd.find(".uploadButton").hide();
+	
+	Global.bimServerApi.call("ServiceInterface", "getAllExtendedDataSchemas", {}, function(schemas){
+		schemas.forEach(function(schema){
+			var option = $("<option>" + schema.name + "</option>");
+			option.val(schema.name);
+			$(".schemaSelect").append(option);
+			othis.schemas[schema.name] = schema;
+		});
+	});
+	
+	$(".file").change(function(e){
+		othis.processFiles(e.target.files)
+	});
+	
+	cd.find(".chooseFileButton").click(function() {
+		cd.find(".file").trigger("click");
+	});
+	
+	cd.find(".uploadButton").click(function(event){
+		othis.uploadNew(othis.project);
+		event.preventDefault();
+	});
+}
+</script>

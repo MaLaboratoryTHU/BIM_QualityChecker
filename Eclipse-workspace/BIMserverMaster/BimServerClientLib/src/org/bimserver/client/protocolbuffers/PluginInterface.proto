@@ -1,0 +1,1136 @@
+package org.bimserver.pb;
+
+/******************************************************************************
+ * Copyright (C) 2009-2019  BIMserver.org
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see {@literal<http://www.gnu.org/licenses/>}.
+ *****************************************************************************/
+import "ServiceInterface.proto";
+import "NewServicesInterface.proto";
+import "AdminInterface.proto";
+import "MetaInterface.proto";
+import "SettingsInterface.proto";
+import "AuthInterface.proto";
+option java_generic_services = true;
+
+option java_outer_classname = "PluginInterfaceImpl";
+
+option optimize_for = SPEED;
+
+service PluginInterface {
+	rpc addDeserializer (AddDeserializerRequest) returns (AddDeserializerResponse);
+
+	rpc addInternalService (AddInternalServiceRequest) returns (AddInternalServiceResponse);
+
+	rpc addModelCompare (AddModelCompareRequest) returns (AddModelCompareResponse);
+
+	rpc addModelMerger (AddModelMergerRequest) returns (AddModelMergerResponse);
+
+	rpc addQueryEngine (AddQueryEngineRequest) returns (AddQueryEngineResponse);
+
+	rpc addRenderEngine (AddRenderEngineRequest) returns (AddRenderEngineResponse);
+
+	rpc addSerializer (AddSerializerRequest) returns (AddSerializerResponse);
+
+	rpc clearMavenCache (ClearMavenCacheRequest) returns (VoidResponse);
+
+	rpc deleteDeserializer (DeleteDeserializerRequest) returns (VoidResponse);
+
+	rpc deleteInternalService (DeleteInternalServiceRequest) returns (VoidResponse);
+
+	rpc deleteModelChecker (DeleteModelCheckerRequest) returns (VoidResponse);
+
+	rpc deleteModelCompare (DeleteModelCompareRequest) returns (VoidResponse);
+
+	rpc deleteModelMerger (DeleteModelMergerRequest) returns (VoidResponse);
+
+	rpc deletePluginConfiguration (DeletePluginConfigurationRequest) returns (VoidResponse);
+
+	rpc deleteQueryEngine (DeleteQueryEngineRequest) returns (VoidResponse);
+
+	rpc deleteRenderEngine (DeleteRenderEngineRequest) returns (VoidResponse);
+
+	rpc deleteSerializer (DeleteSerializerRequest) returns (VoidResponse);
+
+	rpc getAllDeserializerPluginDescriptors (GetAllDeserializerPluginDescriptorsRequest) returns (GetAllDeserializerPluginDescriptorsResponse);
+
+	rpc getAllDeserializers (GetAllDeserializersRequest) returns (GetAllDeserializersResponse);
+
+	rpc getAllDeserializersForProject (GetAllDeserializersForProjectRequest) returns (GetAllDeserializersForProjectResponse);
+
+	rpc getAllInternalServices (GetAllInternalServicesRequest) returns (GetAllInternalServicesResponse);
+
+	rpc getAllInternalServicesOfService (GetAllInternalServicesOfServiceRequest) returns (GetAllInternalServicesOfServiceResponse);
+
+	rpc getAllModelCheckerPluginDescriptors (GetAllModelCheckerPluginDescriptorsRequest) returns (GetAllModelCheckerPluginDescriptorsResponse);
+
+	rpc getAllModelComparePluginDescriptors (GetAllModelComparePluginDescriptorsRequest) returns (GetAllModelComparePluginDescriptorsResponse);
+
+	rpc getAllModelCompares (GetAllModelComparesRequest) returns (GetAllModelComparesResponse);
+
+	rpc getAllModelMergerPluginDescriptors (GetAllModelMergerPluginDescriptorsRequest) returns (GetAllModelMergerPluginDescriptorsResponse);
+
+	rpc getAllModelMergers (GetAllModelMergersRequest) returns (GetAllModelMergersResponse);
+
+	rpc getAllQueryEnginePluginDescriptors (GetAllQueryEnginePluginDescriptorsRequest) returns (GetAllQueryEnginePluginDescriptorsResponse);
+
+	rpc getAllQueryEngines (GetAllQueryEnginesRequest) returns (GetAllQueryEnginesResponse);
+
+	rpc getAllRenderEnginePluginDescriptors (GetAllRenderEnginePluginDescriptorsRequest) returns (GetAllRenderEnginePluginDescriptorsResponse);
+
+	rpc getAllRenderEngines (GetAllRenderEnginesRequest) returns (GetAllRenderEnginesResponse);
+
+	rpc getAllSerializerPluginDescriptors (GetAllSerializerPluginDescriptorsRequest) returns (GetAllSerializerPluginDescriptorsResponse);
+
+	rpc getAllSerializers (GetAllSerializersRequest) returns (GetAllSerializersResponse);
+
+	rpc getAllSerializersForPoids (GetAllSerializersForPoidsRequest) returns (GetAllSerializersForPoidsResponse);
+
+	rpc getAllSerializersForRoids (GetAllSerializersForRoidsRequest) returns (GetAllSerializersForRoidsResponse);
+
+	rpc getAllServicePluginDescriptors (GetAllServicePluginDescriptorsRequest) returns (GetAllServicePluginDescriptorsResponse);
+
+	rpc getAllWebModulePluginDescriptors (GetAllWebModulePluginDescriptorsRequest) returns (GetAllWebModulePluginDescriptorsResponse);
+
+	rpc getAllWebModules (GetAllWebModulesRequest) returns (GetAllWebModulesResponse);
+
+	rpc getAvailablePluginBundles (GetAvailablePluginBundlesRequest) returns (GetAvailablePluginBundlesResponse);
+
+	rpc getDefaultModelCompare (GetDefaultModelCompareRequest) returns (GetDefaultModelCompareResponse);
+
+	rpc getDefaultModelMerger (GetDefaultModelMergerRequest) returns (GetDefaultModelMergerResponse);
+
+	rpc getDefaultQueryEngine (GetDefaultQueryEngineRequest) returns (GetDefaultQueryEngineResponse);
+
+	rpc getDefaultRenderEngine (GetDefaultRenderEngineRequest) returns (GetDefaultRenderEngineResponse);
+
+	rpc getDefaultRenderEnginePluginDescriptor (GetDefaultRenderEnginePluginDescriptorRequest) returns (GetDefaultRenderEnginePluginDescriptorResponse);
+
+	rpc getDefaultSerializer (GetDefaultSerializerRequest) returns (GetDefaultSerializerResponse);
+
+	rpc getDefaultWebModule (GetDefaultWebModuleRequest) returns (GetDefaultWebModuleResponse);
+
+	rpc getInstalledPluginBundle (GetInstalledPluginBundleRequest) returns (GetInstalledPluginBundleResponse);
+
+	rpc getInstalledPluginBundles (GetInstalledPluginBundlesRequest) returns (GetInstalledPluginBundlesResponse);
+
+	rpc getInternalServiceById (GetInternalServiceByIdRequest) returns (GetInternalServiceByIdResponse);
+
+	rpc getModelCompareById (GetModelCompareByIdRequest) returns (GetModelCompareByIdResponse);
+
+	rpc getModelCompareByName (GetModelCompareByNameRequest) returns (GetModelCompareByNameResponse);
+
+	rpc getModelMergerById (GetModelMergerByIdRequest) returns (GetModelMergerByIdResponse);
+
+	rpc getModelMergerByName (GetModelMergerByNameRequest) returns (GetModelMergerByNameResponse);
+
+	rpc getPluginBundle (GetPluginBundleRequest) returns (GetPluginBundleResponse);
+
+	rpc getPluginBundleVersionById (GetPluginBundleVersionByIdRequest) returns (GetPluginBundleVersionByIdResponse);
+
+	rpc getPluginDescriptor (GetPluginDescriptorRequest) returns (GetPluginDescriptorResponse);
+
+	rpc getPluginDescriptorByName (GetPluginDescriptorByNameRequest) returns (GetPluginDescriptorByNameResponse);
+
+	rpc getPluginInformation (GetPluginInformationRequest) returns (GetPluginInformationResponse);
+
+	rpc getPluginObjectDefinition (GetPluginObjectDefinitionRequest) returns (GetPluginObjectDefinitionResponse);
+
+	rpc getPluginSettings (GetPluginSettingsRequest) returns (GetPluginSettingsResponse);
+
+	rpc getPluginSystemObjectDefinition (GetPluginSystemObjectDefinitionRequest) returns (GetPluginSystemObjectDefinitionResponse);
+
+	rpc getPluginSystemSettings (GetPluginSystemSettingsRequest) returns (GetPluginSystemSettingsResponse);
+
+	rpc getRenderEngineById (GetRenderEngineByIdRequest) returns (GetRenderEngineByIdResponse);
+
+	rpc getRenderEngineByName (GetRenderEngineByNameRequest) returns (GetRenderEngineByNameResponse);
+
+	rpc getSerializerByPluginClassName (GetSerializerByPluginClassNameRequest) returns (GetSerializerByPluginClassNameResponse);
+
+	rpc getWebModuleById (GetWebModuleByIdRequest) returns (GetWebModuleByIdResponse);
+
+	rpc getWebModuleByName (GetWebModuleByNameRequest) returns (GetWebModuleByNameResponse);
+
+	rpc hasActiveSerializer (HasActiveSerializerRequest) returns (HasActiveSerializerResponse);
+
+	rpc hasPreBuiltPlugins (HasPreBuiltPluginsRequest) returns (HasPreBuiltPluginsResponse);
+
+	rpc installPluginBundle (InstallPluginBundleRequest) returns (VoidResponse);
+
+	rpc installPluginBundleFromFile (InstallPluginBundleFromFileRequest) returns (VoidResponse);
+
+	rpc installPluginBundleFromUrl (InstallPluginBundleFromUrlRequest) returns (VoidResponse);
+
+	rpc installPreBuiltPlugins (InstallPreBuiltPluginsRequest) returns (VoidResponse);
+
+	rpc listAllWebModules (ListAllWebModulesRequest) returns (ListAllWebModulesResponse);
+
+	rpc listPluginsInBundle (ListPluginsInBundleRequest) returns (ListPluginsInBundleResponse);
+
+	rpc setDefaultModelCompare (SetDefaultModelCompareRequest) returns (VoidResponse);
+
+	rpc setDefaultModelMerger (SetDefaultModelMergerRequest) returns (VoidResponse);
+
+	rpc setDefaultQueryEngine (SetDefaultQueryEngineRequest) returns (VoidResponse);
+
+	rpc setDefaultRenderEngine (SetDefaultRenderEngineRequest) returns (VoidResponse);
+
+	rpc setDefaultSerializer (SetDefaultSerializerRequest) returns (VoidResponse);
+
+	rpc setDefaultWebModule (SetDefaultWebModuleRequest) returns (VoidResponse);
+
+	rpc setPluginSettings (SetPluginSettingsRequest) returns (VoidResponse);
+
+	rpc setPluginSystemSettings (SetPluginSystemSettingsRequest) returns (VoidResponse);
+
+	rpc uninstallPluginBundle (UninstallPluginBundleRequest) returns (VoidResponse);
+
+	rpc updateDeserializer (UpdateDeserializerRequest) returns (VoidResponse);
+
+	rpc updateInternalService (UpdateInternalServiceRequest) returns (VoidResponse);
+
+	rpc updateModelCompare (UpdateModelCompareRequest) returns (VoidResponse);
+
+	rpc updateModelMerger (UpdateModelMergerRequest) returns (VoidResponse);
+
+	rpc updatePluginBundle (UpdatePluginBundleRequest) returns (VoidResponse);
+
+	rpc updateQueryEngine (UpdateQueryEngineRequest) returns (VoidResponse);
+
+	rpc updateRenderEngine (UpdateRenderEngineRequest) returns (VoidResponse);
+
+	rpc updateSerializer (UpdateSerializerRequest) returns (VoidResponse);
+
+}
+
+message AddDeserializerRequest {
+	optional SDeserializerPluginConfiguration deserializer = 1;
+}
+
+message AddDeserializerResponse {
+	optional string errorMessage = 1;
+	optional int64 value = 2;
+}
+
+message SInternalServicePluginConfiguration {
+	optional string description = 1;
+	optional bool enabled = 2;
+	optional string name = 3;
+	optional int64 oid = 4;
+	optional int64 pluginDescriptorId = 5;
+	optional bool publicProfile = 6;
+	optional bool remoteAccessible = 7;
+	optional int32 rid = 8;
+	optional int64 settingsId = 9;
+	optional int64 userSettingsId = 10;
+	optional UUID uuid = 11;
+}
+
+message AddInternalServiceRequest {
+	optional SInternalServicePluginConfiguration internalService = 1;
+}
+
+message AddInternalServiceResponse {
+	optional string errorMessage = 1;
+	optional int64 value = 2;
+}
+
+message SModelComparePluginConfiguration {
+	optional string description = 1;
+	optional bool enabled = 2;
+	optional string name = 3;
+	optional int64 oid = 4;
+	optional int64 pluginDescriptorId = 5;
+	optional int32 rid = 6;
+	optional int64 settingsId = 7;
+	optional int64 userSettingsId = 8;
+	optional UUID uuid = 9;
+}
+
+message AddModelCompareRequest {
+	optional SModelComparePluginConfiguration modelCompare = 1;
+}
+
+message AddModelCompareResponse {
+	optional string errorMessage = 1;
+	optional int64 value = 2;
+}
+
+message SModelMergerPluginConfiguration {
+	optional string description = 1;
+	optional bool enabled = 2;
+	optional string name = 3;
+	optional int64 oid = 4;
+	optional int64 pluginDescriptorId = 5;
+	optional int32 rid = 6;
+	optional int64 settingsId = 7;
+	optional int64 userSettingsId = 8;
+	optional UUID uuid = 9;
+}
+
+message AddModelMergerRequest {
+	optional SModelMergerPluginConfiguration modelMerger = 1;
+}
+
+message AddModelMergerResponse {
+	optional string errorMessage = 1;
+	optional int64 value = 2;
+}
+
+message AddQueryEngineRequest {
+	optional SQueryEnginePluginConfiguration queryEngine = 1;
+}
+
+message AddQueryEngineResponse {
+	optional string errorMessage = 1;
+	optional int64 value = 2;
+}
+
+message SRenderEnginePluginConfiguration {
+	optional string description = 1;
+	optional bool enabled = 2;
+	optional string name = 3;
+	optional int64 oid = 4;
+	optional int64 pluginDescriptorId = 5;
+	optional int32 rid = 6;
+	repeated int64 serializers = 7;
+	optional int64 settingsId = 8;
+	optional int64 userSettingsId = 9;
+	optional UUID uuid = 10;
+}
+
+message AddRenderEngineRequest {
+	optional SRenderEnginePluginConfiguration renderEngine = 1;
+}
+
+message AddRenderEngineResponse {
+	optional string errorMessage = 1;
+	optional int64 value = 2;
+}
+
+message AddSerializerRequest {
+	optional SSerializerPluginConfiguration serializer = 1;
+}
+
+message AddSerializerResponse {
+	optional string errorMessage = 1;
+	optional int64 value = 2;
+}
+
+message ClearMavenCacheRequest {
+}
+
+message DeleteDeserializerRequest {
+	optional int64 sid = 1;
+}
+
+message DeleteInternalServiceRequest {
+	optional int64 oid = 1;
+}
+
+message DeleteModelCheckerRequest {
+	optional int64 iid = 1;
+}
+
+message DeleteModelCompareRequest {
+	optional int64 iid = 1;
+}
+
+message DeleteModelMergerRequest {
+	optional int64 iid = 1;
+}
+
+message DeletePluginConfigurationRequest {
+	optional int64 oid = 1;
+}
+
+message DeleteQueryEngineRequest {
+	optional int64 iid = 1;
+}
+
+message DeleteRenderEngineRequest {
+	optional int64 iid = 1;
+}
+
+message DeleteSerializerRequest {
+	optional int64 sid = 1;
+}
+
+message GetAllDeserializerPluginDescriptorsRequest {
+}
+
+message GetAllDeserializerPluginDescriptorsResponse {
+	optional string errorMessage = 1;
+	repeated SPluginDescriptor value = 2;
+}
+
+message GetAllDeserializersRequest {
+	optional bool onlyEnabled = 1;
+}
+
+message GetAllDeserializersResponse {
+	optional string errorMessage = 1;
+	repeated SDeserializerPluginConfiguration value = 2;
+}
+
+message GetAllDeserializersForProjectRequest {
+	optional bool onlyEnabled = 1;
+	optional int64 poid = 2;
+}
+
+message GetAllDeserializersForProjectResponse {
+	optional string errorMessage = 1;
+	repeated SDeserializerPluginConfiguration value = 2;
+}
+
+message GetAllInternalServicesRequest {
+	optional bool onlyEnabled = 1;
+}
+
+message GetAllInternalServicesResponse {
+	optional string errorMessage = 1;
+	repeated SInternalServicePluginConfiguration value = 2;
+}
+
+message GetAllInternalServicesOfServiceRequest {
+	optional string name = 1;
+	optional bool onlyEnabled = 2;
+}
+
+message GetAllInternalServicesOfServiceResponse {
+	optional string errorMessage = 1;
+	repeated SInternalServicePluginConfiguration value = 2;
+}
+
+message GetAllModelCheckerPluginDescriptorsRequest {
+}
+
+message GetAllModelCheckerPluginDescriptorsResponse {
+	optional string errorMessage = 1;
+	repeated SPluginDescriptor value = 2;
+}
+
+message GetAllModelComparePluginDescriptorsRequest {
+}
+
+message GetAllModelComparePluginDescriptorsResponse {
+	optional string errorMessage = 1;
+	repeated SPluginDescriptor value = 2;
+}
+
+message GetAllModelComparesRequest {
+	optional bool onlyEnabled = 1;
+}
+
+message GetAllModelComparesResponse {
+	optional string errorMessage = 1;
+	repeated SModelComparePluginConfiguration value = 2;
+}
+
+message GetAllModelMergerPluginDescriptorsRequest {
+}
+
+message GetAllModelMergerPluginDescriptorsResponse {
+	optional string errorMessage = 1;
+	repeated SPluginDescriptor value = 2;
+}
+
+message GetAllModelMergersRequest {
+	optional bool onlyEnabled = 1;
+}
+
+message GetAllModelMergersResponse {
+	optional string errorMessage = 1;
+	repeated SModelMergerPluginConfiguration value = 2;
+}
+
+message GetAllQueryEnginePluginDescriptorsRequest {
+}
+
+message GetAllQueryEnginePluginDescriptorsResponse {
+	optional string errorMessage = 1;
+	repeated SPluginDescriptor value = 2;
+}
+
+message GetAllQueryEnginesRequest {
+	optional bool onlyEnabled = 1;
+}
+
+message GetAllQueryEnginesResponse {
+	optional string errorMessage = 1;
+	repeated SQueryEnginePluginConfiguration value = 2;
+}
+
+message GetAllRenderEnginePluginDescriptorsRequest {
+}
+
+message GetAllRenderEnginePluginDescriptorsResponse {
+	optional string errorMessage = 1;
+	repeated SPluginDescriptor value = 2;
+}
+
+message GetAllRenderEnginesRequest {
+	optional bool onlyEnabled = 1;
+}
+
+message GetAllRenderEnginesResponse {
+	optional string errorMessage = 1;
+	repeated SRenderEnginePluginConfiguration value = 2;
+}
+
+message GetAllSerializerPluginDescriptorsRequest {
+}
+
+message GetAllSerializerPluginDescriptorsResponse {
+	optional string errorMessage = 1;
+	repeated SPluginDescriptor value = 2;
+}
+
+message GetAllSerializersRequest {
+	optional bool onlyEnabled = 1;
+}
+
+message GetAllSerializersResponse {
+	optional string errorMessage = 1;
+	repeated SSerializerPluginConfiguration value = 2;
+}
+
+message GetAllSerializersForPoidsRequest {
+	optional bool onlyEnabled = 1;
+	repeated int64 poids = 2;
+}
+
+message GetAllSerializersForPoidsResponse {
+	optional string errorMessage = 1;
+	repeated SSerializerPluginConfiguration value = 2;
+}
+
+message GetAllSerializersForRoidsRequest {
+	optional bool onlyEnabled = 1;
+	repeated int64 roids = 2;
+}
+
+message GetAllSerializersForRoidsResponse {
+	optional string errorMessage = 1;
+	repeated SSerializerPluginConfiguration value = 2;
+}
+
+message GetAllServicePluginDescriptorsRequest {
+}
+
+message GetAllServicePluginDescriptorsResponse {
+	optional string errorMessage = 1;
+	repeated SPluginDescriptor value = 2;
+}
+
+message GetAllWebModulePluginDescriptorsRequest {
+}
+
+message GetAllWebModulePluginDescriptorsResponse {
+	optional string errorMessage = 1;
+	repeated SPluginDescriptor value = 2;
+}
+
+message GetAllWebModulesRequest {
+	optional bool onlyEnabled = 1;
+}
+
+message SWebModulePluginConfiguration {
+	optional string description = 1;
+	optional bool enabled = 2;
+	optional string name = 3;
+	optional int64 oid = 4;
+	optional int64 pluginDescriptorId = 5;
+	optional int32 rid = 6;
+	optional int64 serverSettingsId = 7;
+	optional int64 settingsId = 8;
+	optional UUID uuid = 9;
+}
+
+message GetAllWebModulesResponse {
+	optional string errorMessage = 1;
+	repeated SWebModulePluginConfiguration value = 2;
+}
+
+message GetAvailablePluginBundlesRequest {
+}
+
+enum SPluginBundleType{
+	SPluginBundleType_MAVEN = 0;
+	SPluginBundleType_GITHUB = 1;
+	SPluginBundleType_LOCAL = 2;
+	SPluginBundleType_LOCAL_DEV = 3;
+}
+
+message SPluginBundleVersion {
+	optional string artifactId = 1;
+	optional int64 date = 2;
+	optional string description = 3;
+	optional string groupId = 4;
+	optional bytes icon = 5;
+	optional bool mismatch = 6;
+	optional string name = 7;
+	optional int64 oid = 8;
+	optional string organization = 9;
+	optional string repository = 10;
+	optional int32 rid = 11;
+	optional SPluginBundleType type = 12;
+	optional UUID uuid = 13;
+	optional string version = 14;
+}
+
+message SPluginBundle {
+	repeated SPluginBundleVersion availableVersions = 1;
+	optional SPluginBundleVersion installedVersion = 2;
+	optional SPluginBundleVersion latestVersion = 3;
+	optional string name = 4;
+	optional int64 oid = 5;
+	optional string organization = 6;
+	optional int32 rid = 7;
+	optional UUID uuid = 8;
+}
+
+message GetAvailablePluginBundlesResponse {
+	optional string errorMessage = 1;
+	repeated SPluginBundle value = 2;
+}
+
+message GetDefaultModelCompareRequest {
+}
+
+message GetDefaultModelCompareResponse {
+	optional string errorMessage = 1;
+	optional SModelComparePluginConfiguration value = 2;
+}
+
+message GetDefaultModelMergerRequest {
+}
+
+message GetDefaultModelMergerResponse {
+	optional string errorMessage = 1;
+	optional SModelMergerPluginConfiguration value = 2;
+}
+
+message GetDefaultQueryEngineRequest {
+}
+
+message GetDefaultQueryEngineResponse {
+	optional string errorMessage = 1;
+	optional SQueryEnginePluginConfiguration value = 2;
+}
+
+message GetDefaultRenderEngineRequest {
+}
+
+message GetDefaultRenderEngineResponse {
+	optional string errorMessage = 1;
+	optional SRenderEnginePluginConfiguration value = 2;
+}
+
+message GetDefaultRenderEnginePluginDescriptorRequest {
+}
+
+message GetDefaultRenderEnginePluginDescriptorResponse {
+	optional string errorMessage = 1;
+	optional SPluginDescriptor value = 2;
+}
+
+message GetDefaultSerializerRequest {
+}
+
+message GetDefaultSerializerResponse {
+	optional string errorMessage = 1;
+	optional SSerializerPluginConfiguration value = 2;
+}
+
+message GetDefaultWebModuleRequest {
+}
+
+message GetDefaultWebModuleResponse {
+	optional string errorMessage = 1;
+	optional SWebModulePluginConfiguration value = 2;
+}
+
+message GetInstalledPluginBundleRequest {
+	optional int64 oid = 1;
+}
+
+message GetInstalledPluginBundleResponse {
+	optional string errorMessage = 1;
+	optional SPluginBundleVersion value = 2;
+}
+
+message GetInstalledPluginBundlesRequest {
+}
+
+message GetInstalledPluginBundlesResponse {
+	optional string errorMessage = 1;
+	repeated SPluginBundle value = 2;
+}
+
+message GetInternalServiceByIdRequest {
+	optional int64 oid = 1;
+}
+
+message GetInternalServiceByIdResponse {
+	optional string errorMessage = 1;
+	optional SInternalServicePluginConfiguration value = 2;
+}
+
+message GetModelCompareByIdRequest {
+	optional int64 oid = 1;
+}
+
+message GetModelCompareByIdResponse {
+	optional string errorMessage = 1;
+	optional SModelComparePluginConfiguration value = 2;
+}
+
+message GetModelCompareByNameRequest {
+	optional string name = 1;
+}
+
+message GetModelCompareByNameResponse {
+	optional string errorMessage = 1;
+	optional SModelComparePluginConfiguration value = 2;
+}
+
+message GetModelMergerByIdRequest {
+	optional int64 oid = 1;
+}
+
+message GetModelMergerByIdResponse {
+	optional string errorMessage = 1;
+	optional SModelMergerPluginConfiguration value = 2;
+}
+
+message GetModelMergerByNameRequest {
+	optional string name = 1;
+}
+
+message GetModelMergerByNameResponse {
+	optional string errorMessage = 1;
+	optional SModelMergerPluginConfiguration value = 2;
+}
+
+message GetPluginBundleRequest {
+	optional string repository = 1;
+	optional string groupId = 2;
+	optional string artifactId = 3;
+}
+
+message GetPluginBundleResponse {
+	optional string errorMessage = 1;
+	optional SPluginBundle value = 2;
+}
+
+message GetPluginBundleVersionByIdRequest {
+	optional int64 pbid = 1;
+}
+
+message GetPluginBundleVersionByIdResponse {
+	optional string errorMessage = 1;
+	optional SPluginBundleVersion value = 2;
+}
+
+message GetPluginDescriptorRequest {
+	optional int64 oid = 1;
+}
+
+message GetPluginDescriptorResponse {
+	optional string errorMessage = 1;
+	optional SPluginDescriptor value = 2;
+}
+
+message GetPluginDescriptorByNameRequest {
+	optional string name = 1;
+}
+
+message GetPluginDescriptorByNameResponse {
+	optional string errorMessage = 1;
+	optional SPluginDescriptor value = 2;
+}
+
+message GetPluginInformationRequest {
+	optional string repository = 1;
+	optional string groupId = 2;
+	optional string artifactId = 3;
+	optional string version = 4;
+}
+
+enum SPluginType{
+	SPluginType_SERIALIZER = 0;
+	SPluginType_DESERIALIZER = 1;
+	SPluginType_RENDER_ENGINE = 2;
+	SPluginType_QUERY_ENGINE = 3;
+	SPluginType_OBJECT_IDM = 4;
+	SPluginType_WEB_MODULE = 5;
+	SPluginType_MODEL_MERGER = 6;
+	SPluginType_MODEL_COMPARE = 7;
+	SPluginType_MODEL_CHECKER = 8;
+	SPluginType_STILL_IMAGE_RENDER = 9;
+	SPluginType_SERVICE = 10;
+}
+
+message SPluginInformation {
+	optional string description = 1;
+	optional bool enabled = 2;
+	optional string identifier = 3;
+	optional bool installForAllUsers = 4;
+	optional bool installForNewUsers = 5;
+	optional string name = 6;
+	optional int64 oid = 7;
+	optional int32 rid = 8;
+	optional SPluginType type = 9;
+	optional UUID uuid = 10;
+}
+
+message GetPluginInformationResponse {
+	optional string errorMessage = 1;
+	repeated SPluginInformation value = 2;
+}
+
+message GetPluginObjectDefinitionRequest {
+	optional int64 oid = 1;
+}
+
+message SArrayType {
+	optional int64 oid = 1;
+	optional int32 rid = 2;
+	optional UUID uuid = 3;
+	repeated SType values = 4;
+}
+
+message SParameter {
+	optional string identifier = 1;
+	optional string name = 2;
+	optional int64 oid = 3;
+	optional int32 rid = 4;
+	optional UUID uuid = 5;
+	optional SType value = 6;
+}
+
+message SObjectType {
+	optional string name = 1;
+	optional int64 oid = 2;
+	repeated SParameter parameters = 3;
+	optional int32 rid = 4;
+	optional UUID uuid = 5;
+}
+
+message SBooleanType {
+	optional int64 oid = 1;
+	optional int32 rid = 2;
+	optional UUID uuid = 3;
+	optional bool value = 4;
+}
+
+message SByteArrayType {
+	optional int64 oid = 1;
+	optional int32 rid = 2;
+	optional UUID uuid = 3;
+	optional bytes value = 4;
+}
+
+message SDoubleType {
+	optional int64 oid = 1;
+	optional int32 rid = 2;
+	optional UUID uuid = 3;
+	optional double value = 4;
+}
+
+message SLongType {
+	optional int64 oid = 1;
+	optional int32 rid = 2;
+	optional UUID uuid = 3;
+	optional int64 value = 4;
+}
+
+message SStringType {
+	optional int64 oid = 1;
+	optional int32 rid = 2;
+	optional UUID uuid = 3;
+	optional string value = 4;
+}
+
+message SPrimitiveType {
+	required string __actual_type = 1;
+	optional SBooleanType __SBooleanType = 2;
+	optional SByteArrayType __SByteArrayType = 3;
+	optional SDoubleType __SDoubleType = 4;
+	optional SLongType __SLongType = 5;
+	optional SStringType __SStringType = 6;
+	optional int64 oid = 7;
+	optional int32 rid = 8;
+	optional UUID uuid = 9;
+}
+
+message SType {
+	required string __actual_type = 1;
+	optional SArrayType __SArrayType = 2;
+	optional SObjectType __SObjectType = 3;
+	optional SPrimitiveType __SPrimitiveType = 4;
+	optional int64 oid = 5;
+	optional int32 rid = 6;
+	optional UUID uuid = 7;
+}
+
+message SArrayDefinition {
+	optional STypeDefinition type = 1;
+}
+
+enum SPrimitiveEnum{
+	SPrimitiveEnum_LONG = 0;
+	SPrimitiveEnum_DOUBLE = 1;
+	SPrimitiveEnum_BOOLEAN = 2;
+	SPrimitiveEnum_STRING = 3;
+	SPrimitiveEnum_BYTE_ARRAY = 4;
+}
+
+message SPrimitiveDefinition {
+	optional SPrimitiveEnum type = 1;
+}
+
+message STypeDefinition {
+	required string __actual_type = 1;
+	optional SArrayDefinition __SArrayDefinition = 2;
+	optional SObjectDefinition __SObjectDefinition = 3;
+	optional SPrimitiveDefinition __SPrimitiveDefinition = 4;
+}
+
+message SParameterDefinition {
+	optional SType defaultValue = 1;
+	optional string description = 2;
+	optional string identifier = 3;
+	optional string name = 4;
+	optional bool required = 5;
+	optional STypeDefinition type = 6;
+}
+
+message SObjectDefinition {
+	repeated SParameterDefinition parameters = 1;
+}
+
+message GetPluginObjectDefinitionResponse {
+	optional string errorMessage = 1;
+	optional SObjectDefinition value = 2;
+}
+
+message GetPluginSettingsRequest {
+	optional int64 poid = 1;
+}
+
+message GetPluginSettingsResponse {
+	optional string errorMessage = 1;
+	optional SObjectType value = 2;
+}
+
+message GetPluginSystemObjectDefinitionRequest {
+	optional int64 oid = 1;
+}
+
+message GetPluginSystemObjectDefinitionResponse {
+	optional string errorMessage = 1;
+	optional SObjectDefinition value = 2;
+}
+
+message GetPluginSystemSettingsRequest {
+	optional int64 poid = 1;
+}
+
+message GetPluginSystemSettingsResponse {
+	optional string errorMessage = 1;
+	optional SObjectType value = 2;
+}
+
+message GetRenderEngineByIdRequest {
+	optional int64 oid = 1;
+}
+
+message GetRenderEngineByIdResponse {
+	optional string errorMessage = 1;
+	optional SRenderEnginePluginConfiguration value = 2;
+}
+
+message GetRenderEngineByNameRequest {
+	optional string name = 1;
+}
+
+message GetRenderEngineByNameResponse {
+	optional string errorMessage = 1;
+	optional SRenderEnginePluginConfiguration value = 2;
+}
+
+message GetSerializerByPluginClassNameRequest {
+	optional string pluginClassName = 1;
+}
+
+message GetSerializerByPluginClassNameResponse {
+	optional string errorMessage = 1;
+	optional SSerializerPluginConfiguration value = 2;
+}
+
+message GetWebModuleByIdRequest {
+	optional int64 oid = 1;
+}
+
+message GetWebModuleByIdResponse {
+	optional string errorMessage = 1;
+	optional SWebModulePluginConfiguration value = 2;
+}
+
+message GetWebModuleByNameRequest {
+	optional string name = 1;
+}
+
+message GetWebModuleByNameResponse {
+	optional string errorMessage = 1;
+	optional SWebModulePluginConfiguration value = 2;
+}
+
+message HasActiveSerializerRequest {
+	optional string contentType = 1;
+}
+
+message HasActiveSerializerResponse {
+	optional string errorMessage = 1;
+	optional bool value = 2;
+}
+
+message HasPreBuiltPluginsRequest {
+}
+
+message HasPreBuiltPluginsResponse {
+	optional string errorMessage = 1;
+	optional bool value = 2;
+}
+
+message InstallPluginBundleRequest {
+	optional string repository = 1;
+	optional string groupId = 2;
+	optional string artifactId = 3;
+	optional string version = 4;
+	repeated SPluginInformation plugins = 5;
+}
+
+message InstallPluginBundleFromFileRequest {
+	optional bytes data = 1;
+	optional bool installAllPluginsForAllUsers = 2;
+	optional bool installAllPluginsForNewUsers = 3;
+}
+
+message InstallPluginBundleFromUrlRequest {
+	optional string url = 1;
+	optional bool installAllPluginsForAllUsers = 2;
+	optional bool installAllPluginsForNewUsers = 3;
+}
+
+message InstallPreBuiltPluginsRequest {
+	repeated string artifacts = 1;
+}
+
+message ListAllWebModulesRequest {
+}
+
+message ListAllWebModulesResponse {
+	optional string errorMessage = 1;
+	repeated SWebModulePluginConfiguration value = 2;
+}
+
+message ListPluginsInBundleRequest {
+	optional int64 pluginBundleVersionOid = 1;
+}
+
+message ListPluginsInBundleResponse {
+	optional string errorMessage = 1;
+	repeated SPluginDescriptor value = 2;
+}
+
+message SetDefaultModelCompareRequest {
+	optional int64 oid = 1;
+}
+
+message SetDefaultModelMergerRequest {
+	optional int64 oid = 1;
+}
+
+message SetDefaultQueryEngineRequest {
+	optional int64 oid = 1;
+}
+
+message SetDefaultRenderEngineRequest {
+	optional int64 oid = 1;
+}
+
+message SetDefaultSerializerRequest {
+	optional int64 oid = 1;
+}
+
+message SetDefaultWebModuleRequest {
+	optional int64 oid = 1;
+}
+
+message SetPluginSettingsRequest {
+	optional int64 poid = 1;
+	optional SObjectType settings = 2;
+}
+
+message SetPluginSystemSettingsRequest {
+	optional int64 poid = 1;
+	optional SObjectType settings = 2;
+}
+
+message UninstallPluginBundleRequest {
+	optional string repository = 1;
+	optional string groupId = 2;
+	optional string artifactId = 3;
+	optional string version = 4;
+}
+
+message UpdateDeserializerRequest {
+	optional SDeserializerPluginConfiguration deserializer = 1;
+}
+
+message UpdateInternalServiceRequest {
+	optional SInternalServicePluginConfiguration internalService = 1;
+}
+
+message UpdateModelCompareRequest {
+	optional SModelComparePluginConfiguration modelCompare = 1;
+}
+
+message UpdateModelMergerRequest {
+	optional SModelMergerPluginConfiguration modelMerger = 1;
+}
+
+message UpdatePluginBundleRequest {
+	optional string repository = 1;
+	optional string groupId = 2;
+	optional string artifactId = 3;
+	optional string version = 4;
+}
+
+message UpdateQueryEngineRequest {
+	optional SQueryEnginePluginConfiguration queryEngine = 1;
+}
+
+message UpdateRenderEngineRequest {
+	optional SRenderEnginePluginConfiguration renderEngine = 1;
+}
+
+message UpdateSerializerRequest {
+	optional SSerializerPluginConfiguration serializer = 1;
+}
+

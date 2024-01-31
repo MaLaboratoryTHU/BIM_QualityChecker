@@ -1,0 +1,61 @@
+
+ß
+AuthInterface.protoorg.bimserver.pbServiceInterface.protoNewServicesInterface.protoAdminInterface.protoMetaInterface.protoSettingsInterface.proto"O
+ChangePasswordRequest
+uoid (
+oldPassword (	
+newPassword (	"=
+ChangePasswordResponse
+errorMessage (	
+value ("
+GetAccessMethodRequest"_
+GetAccessMethodResponse
+errorMessage (	.
+value (2.org.bimserver.pb.SAccessMethod"
+GetLoggedInUserRequest"W
+GetLoggedInUserResponse
+errorMessage (	&
+value (2.org.bimserver.pb.SUser"
+IsLoggedInRequest"9
+IsLoggedInResponse
+errorMessage (	
+value ("2
+LoginRequest
+username (	
+password (	"4
+LoginResponse
+errorMessage (	
+value (	"&
+LoginUserTokenRequest
+token (	"=
+LoginUserTokenResponse
+errorMessage (	
+value (	"
+LogoutRequest"^
+RequestPasswordChangeRequest
+username (	
+resetUrl (	
+includeSiteAddress (":
+SetHashRequest
+uoid (
+hash (
+salt ("G
+ValidateAccountRequest
+uoid (
+token (	
+password (	"W
+ValidateAccountResponse
+errorMessage (	&
+value (2.org.bimserver.pb.SUser2µ
+AuthInterfacec
+changePassword'.org.bimserver.pb.ChangePasswordRequest(.org.bimserver.pb.ChangePasswordResponsef
+getAccessMethod(.org.bimserver.pb.GetAccessMethodRequest).org.bimserver.pb.GetAccessMethodResponsef
+getLoggedInUser(.org.bimserver.pb.GetLoggedInUserRequest).org.bimserver.pb.GetLoggedInUserResponseW
+
+isLoggedIn#.org.bimserver.pb.IsLoggedInRequest$.org.bimserver.pb.IsLoggedInResponseH
+login.org.bimserver.pb.LoginRequest.org.bimserver.pb.LoginResponsec
+loginUserToken'.org.bimserver.pb.LoginUserTokenRequest(.org.bimserver.pb.LoginUserTokenResponseI
+logout.org.bimserver.pb.LogoutRequest.org.bimserver.pb.VoidResponseg
+requestPasswordChange..org.bimserver.pb.RequestPasswordChangeRequest.org.bimserver.pb.VoidResponseK
+setHash .org.bimserver.pb.SetHashRequest.org.bimserver.pb.VoidResponsef
+validateAccount(.org.bimserver.pb.ValidateAccountRequest).org.bimserver.pb.ValidateAccountResponseBBAuthInterfaceImplHˆ

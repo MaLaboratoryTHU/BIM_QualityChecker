@@ -1,0 +1,42 @@
+<div class="addservice2">
+	<p>You will be forwarded to the website hosted by the service provider. Depending on the service provider's policy, you might have to login (and possibly create an account).
+	The service provider will ask you whether you want to give this BIMserver certain rights (for example if it can use certain creditcard-backed functionalities).</p>	
+
+	<p>In most cases you will also implicitly agree for certain information to be shared between this BIMserver and the Service Provider.</p>
+	
+	<p>After continuing, the process of adding a service should continue here.</p>
+
+	<button class="btn btn-default btnCancel">Cancel</button>
+	<button class="btn btn-primary btnContinue">Continue</button>
+</div>
+<script>
+function AddService2(cd, main, project, serviceDescriptor, isLocal, longCallBack) {
+	var o = this;
+	
+	cd.find(".btnCancel").click(function(){
+		main.pageChanger.current.rightPanel.showAddService(project, null, function(){
+			main.pageChanger.current.rightPanel.loadServices();
+		});
+	});
+	
+	cd.find(".btnContinue").click(function(){
+		Global.bimServerApi.call("OAuthInterface", "registerApplication", {registrationEndpoint: serviceDescriptor.registerUrl, apiUrl: serviceDescriptor.url}, function(applicationId){
+			var url = new Url(document.location);
+			url.tab = "services";
+			url.oauth = "true";
+			url.baseUrl = serviceDescriptor.url;
+			url.serviceIdentifier = serviceDescriptor.identifier;
+			url.applicationId = applicationId;
+			url.page = "Project";
+			var uri = url.toString();
+			Global.bimServerApi.call("OAuthInterface", "generateForwardUrl", {
+				registrationEndpoint: serviceDescriptor.registerUrl,
+				authorizeUrl: serviceDescriptor.authorizeUrl,
+				returnUrl: encodeURIComponent(uri)
+			}, function(forwardUrl){
+				document.location = forwardUrl;
+			});
+		});
+	});
+}
+</script>

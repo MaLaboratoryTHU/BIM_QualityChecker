@@ -1,0 +1,215 @@
+<div class="serversettings">
+	<div class="row">
+		<div class="tabbable tabs-left col-md-2">
+			<ul class="nav nav-tabs" style="width: 100%"> 
+				<li class="basicServerSettingsLink active"><a>Server Settings</a></li>
+				<li class="migrationsLink"><a>Migrations</a></li>
+				<li class="installedPluginBundlesLink"><a>Installed Plugin Bundles</a></li>
+				<li class="availablePluginBundlesLink"><a>Available Plugin Bundles</a></li>
+				<li class="webModulesLink"><a>Web Modules</a></li>
+				<li class="extendedDataSchemasLink"><a>Extended Data Schemas</a></li>
+				<li class="modelCheckersLink"><a>Model Checkers</a></li>
+				<li class="oAuthServersLink"><a>OAuth Servers</a></li>
+			</ul>
+		</div>
+		<div class="tab-content col-md-10">
+		</div>
+	</div>
+</div>
+<script>
+	function ServerSettings(main, loadHistory) {
+		var othis = this;
+
+		this.show = function(){
+		};
+		
+		othis.pageChanger = new PageChanger($(".serversettings .nav"), $(".serversettings .tab-content"));
+		
+		this.showAddExtendedDataSchema = function(extendedDataSchema, callback, push) {
+			othis.pageChanger.changePage($(".extendedDataSchemasLink"), "addextendeddataschema.html", function(){
+				pushHistory({page: "ServerSettings", subpage: "AddExtendedDataSchema"}, "Server Settings");
+				return new AddExtendedDataSchema(main, othis, extendedDataSchema);
+			}, callback, push);
+		};
+
+		this.showAddRepoExtendedDataSchema = function(callback, push) {
+			othis.pageChanger.changePage($(".extendedDataSchemasLink"), "addrepoextendeddataschema.html", function(){
+				pushHistory({page: "ServerSettings", subpage: "AddRepoExtendedDataSchema"}, "Server Settings");
+				return new AddRepoExtendedDataSchema(main, othis);
+			}, callback, push);
+		};
+		
+		this.showAddNewModelChecker = function(modelChecker, callback, push) {
+			othis.pageChanger.changePage($(".modelCheckersLink"), "addnewmodelchecker.html", function(){
+				pushHistory({page: "ServerSettings", subpage: "AddNewModelChecker"}, "Server Settings");
+				return new AddNewModelChecker(main, othis, modelChecker);
+			}, callback, push);
+		};
+
+		this.showAddRepoModelChecker = function(callback, push) {
+			othis.pageChanger.changePage($(".modelCheckersLink"), "addrepomodelchecker.html", function(){
+				pushHistory({page: "ServerSettings", subpage: "AddRepoModelChecker"}, "Server Settings");
+				return new AddRepoModelChecker(main, othis);
+			}, callback, push);
+		};
+		
+		this.showExtendedDataSchema = function(oid, callback, push) {
+			othis.pageChanger.changePage($(".extendedDataSchemasLink"), "extendeddataschema.html", function(){
+				return new ExtendedDataSchema(main, oid);
+				pushHistory({page: "ServerSettings", subpage: "ExtendedDataSchema"}, "Extended Data Schema");
+			}, callback, push);
+		};
+		
+		this.showModelChecker = function(oid, callback, push) {
+			othis.pageChanger.changePage($(".modelCheckersLink"), "modelchecker.html", function(){
+				pushHistory({page: "ServerSettings", subpage: "ModelChecker"}, "Model Checker");
+				return new ModelChecker(main, oid);
+			}, callback, push);
+		};
+
+		this.showBasicServerSettings = function(callback, push) {
+			othis.pageChanger.changePage($(".basicServerSettingsLink"), "basicserversettings.html", function(){
+				pushHistory({page: "ServerSettings", subpage: "BasicServerSettings"}, "Basic Server Settings");
+				return new BasicServerSettings(main, othis);
+			}, callback, push);
+		};
+
+		this.showMigrations = function(callback, push) {
+			othis.pageChanger.changePage($(".migrationsLink"), "migrations.html", function(){
+				pushHistory({page: "ServerSettings", subpage: "Migrations"}, "Server Settings");
+				return new Migrations(main, othis);
+			}, callback, push);
+		};
+
+		this.showOAuthServers = function(callback, push) {
+			othis.pageChanger.changePage($(".oAuthServersLink"), "oauthservers.html", function(){
+				pushHistory({page: "ServerSettings", subpage: "OAuthServers"}, "Server Settings");
+				return new OAuthServers($(this), main, othis);
+			}, callback, push);
+		};
+
+		this.showPlugins = function(callback, push) {
+			othis.pageChanger.changePage($(".pluginsLink"), "plugins.html", function(){
+				return new Plugins(main, othis);
+			}, callback, push);
+		};
+
+		this.showInstalledPluginBundles = function(callback, push) {
+			othis.pageChanger.changePage($(".installedPluginBundlesLink"), "installedpluginbundles.html", function(){
+				pushHistory({page: "ServerSettings", subpage: "InstalledPluginBundles"}, "Server Settings");
+				return new InstalledPluginBundles(main, othis, $(this));
+			}, callback, push);
+		};
+
+		this.showInstallPluginBundle = function(pluginBundle, pluginBundleVersion, callback, push) {
+			othis.pageChanger.changePage($(".availablePluginBundlesLink"), "installpluginbundle.html", function(){
+				pushHistory({page: "ServerSettings", subpage: "InstallPluginBundle"}, "Server Settings");
+				return new InstallPluginBundle($(this), othis, pluginBundle, pluginBundleVersion);
+			}, callback, push);
+		};
+
+		this.showPluginSettings = function(plugin, callback, push) {
+			othis.pageChanger.changePage($(".installedPluginBundlesLink"), "pluginsettings.html", function(){
+				pushHistory({page: "ServerSettings", subpage: "PluginSettings"}, "Server Settings");
+				return new PluginSettings($(this), othis, plugin);
+			}, callback, push);
+		};
+
+		this.showUpdatePluginBundle = function(pluginBundle, pluginBundleVersion, callback, push) {
+			othis.pageChanger.changePage($(".installedPluginBundlesLink"), "updatepluginbundle.html", function(){
+				pushHistory({page: "ServerSettings", subpage: "UpdatePluginBundle"}, "Server Settings");
+				return new UpdatePluginBundle($(this), othis, pluginBundle, pluginBundleVersion);
+			}, callback, push);
+		};
+
+		this.showUninstallPluginBundle = function(pluginBundle, pluginBundleVersion, callback, push) {
+			othis.pageChanger.changePage($(".installedPluginBundlesLink"), "uninstallpluginbundle.html", function(){
+				pushHistory({page: "ServerSettings", subpage: "UninstallPluginBundle"}, "Server Settings");
+				return new UninstallPluginBundle($(this), othis, pluginBundle, pluginBundleVersion);
+			}, callback, push);
+		};
+		
+		this.showAvailablePluginBundles = function(callback, push) {
+			othis.pageChanger.changePage($(".availablePluginBundlesLink"), "availablepluginbundles.html", function(){
+				pushHistory({page: "ServerSettings", subpage: "AvailablePluginBundles"}, "Server Settings");
+				return new AvailablePluginBundles(main, othis, $(this));
+			}, callback, push);
+		};
+
+		this.showWebModules = function(callback, push) {
+			othis.pageChanger.changePage($(".webModulesLink"), "webmodules.html", function(){
+				pushHistory({page: "ServerSettings", subpage: "WebModules"}, "Server Settings");
+				return new WebModules(main, othis);
+			}, callback, push);
+		};
+
+		this.showModelCheckers = function(callback, push) {
+			othis.pageChanger.changePage($(".modelCheckersLink"), "modelcheckers.html", function(){
+				pushHistory({page: "ServerSettings", subpage: "ModelCheckers"}, "Server Settings");
+				return new ModelCheckers(main, othis);
+			}, callback, push);
+		};
+
+		this.showExtendedDataSchemas = function(callback, push) {
+			othis.pageChanger.changePage($(".extendedDataSchemasLink"), "extendeddataschemas.html", function(){
+				pushHistory({page: "ServerSettings", subpage: "ExtendedDataSchemas"}, "Server Settings");
+				return new ExtendedDataSchemas(main, othis);
+			}, callback, push);
+		};
+		
+		this.close = function() {
+		};
+		
+		this.getName = function() {
+			return "ServerSettings";
+		};
+
+		if (loadHistory) {
+			var history = History.getState().data;
+			if (history.subpage == "BasicServerSettings") {
+				othis.showBasicServerSettings();
+			} else if (history.subpage == "Migrations") {
+				othis.showMigrations();
+			} else if (history.subpage == "Plugins") {
+				othis.showPlugins();
+			} else if (history.subpage == "AvailablePluginBundles") {
+				othis.showAvailablePluginBundles();
+			} else if (history.subpage == "InstallPluginBundle") {
+				othis.showAvailablePluginBundles();
+			} else if (history.subpage == "InstalledPluginBundles") {
+				othis.showInstalledPluginBundles();
+			} else if (history.subpage == "WebModules") {
+				othis.showWebModules();
+			} else if (history.subpage == "ModelCheckers") {
+				othis.showModelCheckers();
+			} else if (history.subpage == "OAuthServers") {
+				othis.showOAuthServers();
+			} else if (history.subpage == "ExtendedDataSchemas") {
+				othis.showExtendedDataSchemas();
+			} else if (history.subpage == "ExtendedDataSchema") {
+				othis.showExtendedDataSchema(history.edsid);
+//			} else if (history.subpage == "PluginSettings") {
+//				othis.showPluginSettings(plugin);
+			} else {
+				othis.showBasicServerSettings();
+			}
+		}
+
+		$(".serversettings .basicServerSettingsLink").click(function(){othis.showBasicServerSettings(null, true)});
+		$(".serversettings .migrationsLink").click(function(){othis.showMigrations(null, true)});
+		$(".serversettings .oAuthServersLink").click(function(){othis.showOAuthServers(null, true)});
+		$(".serversettings .installedPluginBundlesLink").click(function(){
+			othis.showInstalledPluginBundles(null, true);
+		});
+		$(".serversettings .availablePluginBundlesLink").click(function(){
+			othis.showAvailablePluginBundles(null, true);
+		});
+		$(".serversettings .pluginsLink").click(function(){
+			pushHistory({page: "ServerSettings", subpage: "Plugins"}, "Server Settings");
+			othis.showPlugins(null, true)
+		});
+		$(".serversettings .webModulesLink").click(function(){othis.showWebModules(null, true)});
+		$(".serversettings .modelCheckersLink").click(function(){othis.showModelCheckers(null, true)});
+		$(".serversettings .extendedDataSchemasLink").click(function(){othis.showExtendedDataSchemas(null, true)});
+	}
+</script>

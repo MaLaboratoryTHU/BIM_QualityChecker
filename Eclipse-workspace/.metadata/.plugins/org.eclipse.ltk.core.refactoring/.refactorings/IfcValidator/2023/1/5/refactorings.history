@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;IfcValidator/docs/paths/1114-IfcContext-IfcAxis2Placement3D.txt&apos; to &apos;0104-IfcElement-IfcAxis2Placement3D.txt&apos;" description="Rename resource &apos;1114-IfcContext-IfcAxis2Placement3D.txt&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="docs/paths/1114-IfcContext-IfcAxis2Placement3D.txt" name="0104-IfcElement-IfcAxis2Placement3D.txt" stamp="1675171824878" updateReferences="true"/>
+</session>

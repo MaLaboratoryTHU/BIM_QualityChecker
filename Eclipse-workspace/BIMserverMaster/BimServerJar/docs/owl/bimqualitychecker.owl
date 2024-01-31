@@ -1,0 +1,732 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://www.semanticweb.org/bimqualitychecker/v1.0#"
+     xml:base="http://www.semanticweb.org/bimqualitychecker/v1.0"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:swrl="http://www.w3.org/2003/11/swrl#"
+     xmlns:swrla="http://swrl.stanford.edu/ontologies/3.3/swrla.owl#"
+     xmlns:swrlb="http://www.w3.org/2003/11/swrlb#">
+    <owl:Ontology rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0">
+        <owl:versionIRI rdf:resource="http://www.semanticweb.org/bimqualitychecker"/>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotation properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://swrl.stanford.edu/ontologies/3.3/swrla.owl#isRuleEnabled -->
+
+    <owl:AnnotationProperty rdf:about="http://swrl.stanford.edu/ontologies/3.3/swrla.owl#isRuleEnabled"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#ContainedInProject -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#ContainedInProject">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#Component"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#Part"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#System"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#Project"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#RelatingCoordinateSystem -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#RelatingCoordinateSystem">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#Component"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#Part"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#Project"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#System"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#CoordinateSystem"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#RelatingMaterial -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#RelatingMaterial">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#Component"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#Material"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#ComponentHasMaterial -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#ComponentHasMaterial">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#Component"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#ProjectHasCoordSystem -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#ProjectHasCoordSystem">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#ModelUnit"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#Project"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#SystemHasConsistentCoordSystem -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#SystemHasConsistentCoordSystem">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#ModelUnit"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#System"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#AddditionalProperty -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#AddditionalProperty">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#PropertyFeature"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#ArchComponent -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#ArchComponent">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#Component"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#Colour -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#Colour">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#SurfaceFeature"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#Column -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#Column">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#ArchComponent"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#Component -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#Component">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#ModelUnit"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#CoordinateSystem -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#CoordinateSystem">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#SpaceFeature"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#Door -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#Door">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#ArchComponent"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#ElecComponent -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#ElecComponent">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#Component"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#Feature -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#Feature"/>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#Floor -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#Floor">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#ArchComponent"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#GeometryAccurary -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#GeometryAccurary">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:oneOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#G1"/>
+                    <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#G2"/>
+                    <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#G3"/>
+                    <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#G4"/>
+                </owl:oneOf>
+            </owl:Class>
+        </owl:equivalentClass>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#GeometryFeature"/>
+        <rdfs:subClassOf>
+            <owl:Class>
+                <owl:oneOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#G1"/>
+                    <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#G2"/>
+                    <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#G3"/>
+                    <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#G4"/>
+                </owl:oneOf>
+            </owl:Class>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#GeometryFeature -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#GeometryFeature">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#Feature"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#HvacComponent -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#HvacComponent">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#Component"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#InformationDepth -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#InformationDepth">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:oneOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#N1"/>
+                    <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#N2"/>
+                    <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#N3"/>
+                    <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#N4"/>
+                </owl:oneOf>
+            </owl:Class>
+        </owl:equivalentClass>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#PropertyFeature"/>
+        <rdfs:subClassOf>
+            <owl:Class>
+                <owl:oneOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#N1"/>
+                    <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#N2"/>
+                    <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#N3"/>
+                    <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#N4"/>
+                </owl:oneOf>
+            </owl:Class>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#LocationPoint -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#LocationPoint">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#SpaceFeature"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#Material -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#Material">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#SurfaceFeature"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#ModelUnit -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#ModelUnit"/>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#Part -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#Part">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#ModelUnit"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#PlumbComponent -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#PlumbComponent">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#Component"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#Project -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#Project">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#ModelUnit"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#PropertyFeature -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#PropertyFeature">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#Feature"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#Roof -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#Roof">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#ArchComponent"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#Shape -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#Shape">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#GeometryFeature"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#SpaceFeature -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#SpaceFeature">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#Feature"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#SpaceOccupy -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#SpaceOccupy">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#SpaceFeature"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#StruComponent -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#StruComponent">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#Component"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#SurfaceFeature -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#SurfaceFeature">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#Feature"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#System -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#System">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#ModelUnit"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#Wall -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#Wall">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#ArchComponent"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#Window -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#Window">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#ArchComponent"/>
+    </owl:Class>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#G1 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#G1">
+        <rdf:type rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#GeometryAccurary"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#G2 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#G2">
+        <rdf:type rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#GeometryAccurary"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#G3 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#G3">
+        <rdf:type rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#GeometryAccurary"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#G4 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#G4">
+        <rdf:type rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#GeometryAccurary"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#N1 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#N1">
+        <rdf:type rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#InformationDepth"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#N2 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#N2">
+        <rdf:type rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#InformationDepth"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#N3 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#N3">
+        <rdf:type rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#InformationDepth"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/bimqualitychecker/v1.0#N4 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#N4">
+        <rdf:type rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#InformationDepth"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // General axioms
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <owl:Class>
+        <owl:oneOf rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#G1"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#G2"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#G3"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#G4"/>
+        </owl:oneOf>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#Feature"/>
+    </owl:Class>
+    <owl:Class>
+        <owl:oneOf rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#G1"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#G2"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#G3"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#G4"/>
+        </owl:oneOf>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#GeometryAccurary"/>
+    </owl:Class>
+    <owl:Class>
+        <owl:oneOf rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#G1"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#G2"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#G3"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#G4"/>
+        </owl:oneOf>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#GeometryFeature"/>
+    </owl:Class>
+    <owl:Class>
+        <owl:oneOf rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#N1"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#N2"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#N3"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#N4"/>
+        </owl:oneOf>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#Feature"/>
+    </owl:Class>
+    <owl:Class>
+        <owl:oneOf rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#N1"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#N2"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#N3"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#N4"/>
+        </owl:oneOf>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#InformationDepth"/>
+    </owl:Class>
+    <owl:Class>
+        <owl:oneOf rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#N1"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#N2"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#N3"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#N4"/>
+        </owl:oneOf>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#PropertyFeature"/>
+    </owl:Class>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Rules
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <rdf:Description rdf:about="urn:swrl:var#x">
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Variable"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#x">
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Variable"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#y">
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Variable"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#z">
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Variable"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://www.semanticweb.org/bimqualitychecker/v1.0#w">
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Variable"/>
+    </rdf:Description>
+    <rdf:Description>
+        <rdfs:comment>ComponentHasMaterial</rdfs:comment>
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Imp"/>
+        <swrl:body>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#Component"/>
+                        <swrl:argument1 rdf:resource="urn:swrl:var#x"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                        <rdf:first>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                <swrl:classPredicate>
+                                    <owl:Restriction>
+                                        <owl:onProperty rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#RelatingMaterial"/>
+                                        <owl:minQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:minQualifiedCardinality>
+                                        <owl:onClass rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#Material"/>
+                                    </owl:Restriction>
+                                </swrl:classPredicate>
+                                <swrl:argument1 rdf:resource="urn:swrl:var#x"/>
+                            </rdf:Description>
+                        </rdf:first>
+                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                    </rdf:Description>
+                </rdf:rest>
+            </rdf:Description>
+        </swrl:body>
+        <swrl:head>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#DatavaluedPropertyAtom"/>
+                        <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#ComponentHasMaterial"/>
+                        <swrl:argument1 rdf:resource="urn:swrl:var#x"/>
+                        <swrl:argument2 rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</swrl:argument2>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+            </rdf:Description>
+        </swrl:head>
+    </rdf:Description>
+    <rdf:Description>
+        <swrla:isRuleEnabled rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</swrla:isRuleEnabled>
+        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"></rdfs:comment>
+        <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">SystemHasConsistentCoordSystem</rdfs:label>
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Imp"/>
+        <swrl:body>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#System"/>
+                        <swrl:argument1 rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#x"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                        <rdf:first>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#RelatingCoordinateSystem"/>
+                                <swrl:argument1 rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#x"/>
+                                <swrl:argument2 rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#y"/>
+                            </rdf:Description>
+                        </rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                <rdf:first>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#CoordinateSystem"/>
+                                        <swrl:argument1 rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#y"/>
+                                    </rdf:Description>
+                                </rdf:first>
+                                <rdf:rest>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                        <rdf:first>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                                <swrl:classPredicate rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#Project"/>
+                                                <swrl:argument1 rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#z"/>
+                                            </rdf:Description>
+                                        </rdf:first>
+                                        <rdf:rest>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                <rdf:first>
+                                                    <rdf:Description>
+                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                                        <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#ContainedInProject"/>
+                                                        <swrl:argument1 rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#x"/>
+                                                        <swrl:argument2 rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#z"/>
+                                                    </rdf:Description>
+                                                </rdf:first>
+                                                <rdf:rest>
+                                                    <rdf:Description>
+                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                        <rdf:first>
+                                                            <rdf:Description>
+                                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                                                <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#RelatingCoordinateSystem"/>
+                                                                <swrl:argument1 rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#z"/>
+                                                                <swrl:argument2 rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#w"/>
+                                                            </rdf:Description>
+                                                        </rdf:first>
+                                                        <rdf:rest>
+                                                            <rdf:Description>
+                                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                                <rdf:first>
+                                                                    <rdf:Description>
+                                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#SameIndividualAtom"/>
+                                                                        <swrl:argument1 rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#y"/>
+                                                                        <swrl:argument2 rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#w"/>
+                                                                    </rdf:Description>
+                                                                </rdf:first>
+                                                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                            </rdf:Description>
+                                                        </rdf:rest>
+                                                    </rdf:Description>
+                                                </rdf:rest>
+                                            </rdf:Description>
+                                        </rdf:rest>
+                                    </rdf:Description>
+                                </rdf:rest>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </rdf:rest>
+            </rdf:Description>
+        </swrl:body>
+        <swrl:head>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#DatavaluedPropertyAtom"/>
+                        <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#SystemHasConsistentCoordSystem"/>
+                        <swrl:argument1 rdf:resource="http://www.semanticweb.org/bimqualitychecker/v1.0#x"/>
+                        <swrl:argument2 rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</swrl:argument2>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+            </rdf:Description>
+        </swrl:head>
+    </rdf:Description>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi -->
+

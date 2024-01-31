@@ -1,0 +1,547 @@
+<div class="project">
+	<div class="row">
+		<div class="col-md-4 navigatorWrapper">
+		</div>
+		<div class="col-md-8 rightCol">
+			<div class="rightpanel ih">
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+function Project(containerDiv, main, project) {
+	var othis = this;
+	othis.loaded = {}; // poid -> roid
+	othis.models = {};
+	othis.main = main;
+	
+	othis.threeDAspectVisible = new Variable(false);
+	othis.selectListeners = new EventRegistry();
+	othis.unselectListeners = new EventRegistry();
+	othis.objectVisibilityListeners = new EventRegistry();
+	othis.modelLoadedListeners = new EventRegistry();
+	othis.modelAddedListeners = new EventRegistry();
+	othis.modelUnloadedListeners = new EventRegistry();
+	othis.menuItems = [];
+	
+	this.show = function(push){
+		if (typeof project == "number" || typeof project == "string") {
+			othis.reloadProject(project, push);
+		} else {
+			othis.project = project;
+			var promise = othis.updateProject(push);
+			promise.done(function(){
+				othis.resize();
+			});
+			return promise;
+		}
+	};
+
+	this.reloadProject = function(poid, push) {
+		var promise = new BimServerApiPromise()
+		if (poid == null) {
+			poid = othis.project.oid;
+		}
+		Global.bimServerApi.call("ServiceInterface", "getProjectByPoid", {poid: poid}, function(project){
+			othis.project = project;
+			promise.chain(othis.updateProject(push));
+		});
+		return promise;
+	};
+
+	this.close = function(){
+		othis.menuItems.forEach(function(menuItem){
+			menuItem.remove();
+		});
+	};
+
+	this.selected = function(origin, groupId, object){
+		othis.selectListeners.trigger(function(selectListener){
+			selectListener(origin, groupId, object);
+		});
+	};
+	
+	this.unselected = function(groupId, id){
+		othis.unselectListeners.trigger(function(unselectListener){
+			unselectListener(groupId, id);
+		});
+	};
+	
+	this.setObjectVisibility = function(groupId, ids, mode) {
+		if (!Array.isArray(ids)) {
+			ids = [ids];
+		}
+		var objectArray = [];
+		var oldModeArray = [];
+		
+		ids.forEach(function(id){
+			othis.models[groupId].get(id, function(object){
+				if (object != null) {
+					var oldMode = object.trans.mode;
+					object.trans.mode = mode;
+					objectArray.push(object);
+					oldModeArray.push(oldMode);
+				}
+			});
+		});
+
+		containerDiv.find(".rightCol > .details").show();
+		
+		othis.objectVisibilityListeners.trigger(function(objectVisibilityListener){
+			objectVisibilityListener(objectArray, oldModeArray);
+		});
+	};
+	
+	this.resize = function(){
+		othis.navigator.resize();
+//		containerDiv.find(".sidespanWrapper").height(($(window).height() - $(".navbar").outerHeight() - containerDiv.find(".col-md-4 .panel-heading").outerHeight() - 57) + "px");
+	};
+	
+	this.unloadRevision = function(project){
+		if (othis.loaded[project.oid] != null) {
+			othis.modelUnloadedListeners.trigger(function(modelUnloadedListener){
+				modelUnloadedListener(project.oid, othis.loaded[project.oid]);
+			});
+		}
+	};
+	
+	this.changeRevision = function(project, roid){
+		if (othis.loaded[project.oid] != null) {
+			othis.modelUnloadedListeners.trigger(function(modelUnloadedListener){
+				modelUnloadedListener(project.oid, othis.loaded[project.oid]);
+			});
+		}
+		othis.loaded[project.oid] = roid;
+
+		if (project.nrSubProjects == 0 && roid != -1) {
+			// TODO possibly cache
+			Global.bimServerApi.getModel(project.oid, roid, project.schema, false, function(model){
+				othis.models[roid] = model;
+				othis.modelAddedListeners.trigger(function(listener){
+					listener(project, roid, [], {});
+				});
+			}, project.name);
+		} else {
+			othis.modelAddedListeners.trigger(function(modelAddedListener){
+				modelAddedListener(project, -1, [], {});
+			});
+		}
+	};
+	
+	this.loadModel = function(){
+		othis.projects.forEach(function(project){
+			var ids = [];
+			var roid = project.lastRevisionId;
+			var model = othis.models[roid];
+			othis.preloadModel(project, roid).done(function(){
+			});
+		});
+	};
+	
+	this.preloadModel = function(project, roid){
+		console.time("preloadModel " + roid);
+		var countingPromise = new CountingPromise();
+		var promise = new BimServerApiPromise();
+		var model = othis.models[roid];
+		if (model == null) {
+			console.log("no model", othis.models);
+		} else {
+			if (model.isPreloaded) {
+				promise.fire();
+				return promise;
+			} else {
+				if (project.schema == "ifc2x3tc1") {
+					var preLoadQuery = {
+						defines: {
+							Representation: {
+								type: "IfcProduct",
+								fields: ["Representation", "geometry"]
+							},
+							ContainsElementsDefine: {
+								type: "IfcSpatialStructureElement",
+								field: "ContainsElements",
+								include: {
+									type: "IfcRelContainedInSpatialStructure",
+									field: "RelatedElements",
+									includes: [
+										"IsDecomposedByDefine",
+										"ContainsElementsDefine",
+										"Representation"
+									]
+								}
+							},
+							IsDecomposedByDefine: {
+								type: "IfcObjectDefinition",
+								field: "IsDecomposedBy",
+								include: {
+									type: "IfcRelDecomposes",
+									field: "RelatedObjects",
+									includes: [
+										"IsDecomposedByDefine",
+										"ContainsElementsDefine",
+										"Representation"
+									]
+								}
+							}
+						},
+						queries: [
+						    {
+								type: "IfcProject",
+								includes: [
+									"IsDecomposedByDefine",
+									"ContainsElementsDefine"
+								]
+						    },
+						    {
+						    	type: {
+						    		name: "IfcRepresentation",
+						    		includeAllSubTypes: true
+						    	}
+						    },
+						    {
+						    	type: {
+						    		name: "IfcProductRepresentation",
+						    		includeAllSubTypes: true
+						    	}
+						    },
+						    {
+						    	type: "IfcPresentationLayerWithStyle"
+						    },
+						    {
+						    	type: {
+						    		name: "IfcProduct",
+						    		includeAllSubTypes: true
+						    	}
+						    },
+						    {
+						    	type: "IfcProductDefinitionShape"
+						    },
+						    {
+						    	type: "IfcPresentationLayerAssignment"
+						    },
+						    {
+						    	type: "IfcRelAssociatesClassification",
+						    	includes: [
+						    		{
+						    			type: "IfcRelAssociatesClassification",
+						    			field: "RelatedObjects"
+						    		},
+						    		{
+						    			type: "IfcRelAssociatesClassification",
+						    			field: "RelatingClassification"
+						    		}
+						    	]
+						    },
+						    {
+						    	type: "IfcSIUnit"
+						    },
+						    {
+						    	type: "IfcPresentationLayerAssignment"
+						    }
+						]
+					};
+				} else if (project.schema == "ifc4") {
+					var preLoadQuery = {
+						defines: {
+							Representation: {
+								type: "IfcProduct",
+								fields: ["Representation", "geometry"]
+							},
+							ContainsElementsDefine: {
+								type: "IfcSpatialStructureElement",
+								field: "ContainsElements",
+								include: {
+									type: "IfcRelContainedInSpatialStructure",
+									field: "RelatedElements",
+									includes: [
+										"IsDecomposedByDefine",
+										"ContainsElementsDefine",
+										"Representation"
+									]
+								}
+							},
+							IsDecomposedByDefine: {
+								type: "IfcObjectDefinition",
+								field: "IsDecomposedBy",
+								include: {
+									type: "IfcRelAggregates",
+									field: "RelatedObjects",
+									includes: [
+										"IsDecomposedByDefine",
+										"ContainsElementsDefine",
+										"Representation"
+									]
+								}
+							}
+						},
+						queries: [
+						    {
+								type: "IfcProject",
+								includes: [
+									"IsDecomposedByDefine",
+									"ContainsElementsDefine"
+								]
+						    },
+						    {
+						    	type: {
+						    		name: "IfcRepresentation",
+							    	includeAllSubTypes: true
+						    	}
+						    },
+						    {
+						    	type: {
+						    		name: "IfcProductRepresentation",
+						    		includeAllSubTypes: true
+						    	}
+						    },
+						    {
+						    	type: "IfcPresentationLayerWithStyle"
+						    },
+						    {
+						    	type: {
+						    		name: "IfcProduct",
+							    	includeAllSubTypes: true
+						    	},
+						    },
+						    {
+						    	type: "IfcProductDefinitionShape"
+						    },
+						    {
+						    	type: "IfcPresentationLayerAssignment"
+						    },
+						    {
+						    	type: "IfcRelAssociatesClassification",
+						    	includes: [
+						    		{
+						    			type: "IfcRelAssociatesClassification",
+						    			field: "RelatedObjects"
+						    		},
+						    		{
+						    			type: "IfcRelAssociatesClassification",
+						    			field: "RelatingClassification"
+						    		}
+						    	]
+						    },
+						    {
+						    	type: "IfcSIUnit"
+						    },
+						    {
+						    	type: "IfcPresentationLayerAssignment"
+						    }
+						]
+					};
+				}
+				model.query(preLoadQuery, function(loaded){
+				}).done(function(){
+					console.timeEnd("preloadModel " + roid);
+					Global.notifier.setInfo("Loading model data...", -1);
+					setTimeout(function(){
+						model.isPreloaded = true;
+						othis.modelLoadedListeners.trigger(function(modelLoadedListener){
+							modelLoadedListener(project, roid);
+						});
+						Global.notifier.setSuccess("Model data successfully loaded");
+						promise.fire();
+					}, 0);
+				});
+			}			
+		}
+		return promise;
+	};
+
+	this.updateProject = function(ph) {
+		var promise = new BimServerApiPromise()
+		if (ph) {
+			pushHistory({page: "Project", poid: othis.project.oid}, "Project");
+		}
+
+		$(window).resize(othis.resize);
+		
+		othis.projects = [];
+		Global.bimServerApi.call("ServiceInterface", "getAllRelatedProjects", {poid: othis.project.oid}, function(list){
+			list.forEach(function(smallProject){
+				if (smallProject.state == "ACTIVE") {
+					othis.loaded[smallProject.oid] = smallProject.lastRevisionId;
+					othis.projects.push(smallProject);
+				}
+				if (smallProject.lastRevisionId != -1 && smallProject.nrSubProjects == 0) {
+					Global.bimServerApi.getModel(smallProject.oid, smallProject.lastRevisionId, smallProject.schema, false, function(model){
+						othis.models[smallProject.lastRevisionId] = model;
+					}, smallProject.name);
+				}
+			});
+
+			othis.selectListeners.clear();
+			othis.unselectListeners.clear();
+			othis.objectVisibilityListeners.clear();
+			othis.modelLoadedListeners.clear();
+			othis.modelUnloadedListeners.clear();
+
+			Global.pluginManager.allOfType("TabPlugin", function(pluginConstructor){
+				var plugin = Object.create(pluginConstructor.prototype);
+
+				var label = $("<label class=\"btn btn-default\">");
+				var input = $("<input type=\"radio\" name=\"options\">");
+				label.append(input);
+				label.append(plugin.getTabTitle());
+				containerDiv.find(".projectTabs").append(label);
+
+				var div = $("<div>");
+				div.hide();
+				containerDiv.find(".sidespanWrapper .sidespan").append(div);
+				plugin.init(div, othis);
+				
+				label.click(function(){
+					if (othis.sidespan != null) {
+						othis.sidespan.hide();
+					}
+					othis.sidespan = plugin;
+					othis.sidespan.show();
+					div.show();
+				});
+			});
+
+			containerDiv.find(".navigatorWrapper").load("navigator.html", function(){
+				othis.navigator = new Navigator($(this), othis);
+				othis.navigator.load().done(function(){
+					othis.navigator.projecttree.addMenuDivider("revisionDivider");
+					othis.navigator.projecttree.addMenuItem("Edit project details", "btnEditProjectDetails", function(){
+						var div = $("<div class=\"modal fade\">");
+						$(document.body).append(div);
+						Global.bimServerApi.call("ServiceInterface", "getProjectByPoid", {poid: othis.navigator.projecttree.selectedNode.poid}, function(project){
+							div.load(Global.baseDir + "editproject.html", function(){
+								new EditProject($(this), project);
+							}).modal({keyboard:true});
+						});
+					}).find("a").prepend("<i class=\"glyphicon glyphicon-pencil\"></i> ");
+					othis.navigator.projecttree.addMenuDivider("revisionDivider");
+					othis.navigator.projecttree.addMenuItem("Add sub project", "btnAddProject", function(){
+						Global.bimServerApi.call("ServiceInterface", "getProjectByPoid", {poid: othis.navigator.projecttree.selectedNode.poid}, function(project){
+							main.showAddProject(null, project);
+						});
+					}).find("a").prepend("<i class=\"glyphicon glyphicon-tree-conifer\"></i> ");
+					othis.navigator.projecttree.addMenuItem("Add internal service", "btnAddService", function(){
+						othis.rightPanel.showAddService(othis.navigator.projecttree.selectedNode.project, null, function(){
+							othis.rightPanel.loadServices();
+						});
+					}).find("a").prepend("<i class=\"glyphicon glyphicon-cloud\"></i> ");
+					othis.navigator.projecttree.addMenuItem("Add external service", "btnAddService2", function(){
+						othis.rightPanel.showAddService2(othis.navigator.projecttree.selectedNode.project, null, function(){
+							othis.rightPanel.loadServices();
+						});
+					}).find("a").prepend("<i class=\"glyphicon glyphicon-cloud\"></i> ");
+					othis.navigator.projecttree.addMenuDivider();
+					othis.navigator.projecttree.addMenuItem("Checkin...", "btnCheckin", function(){
+						Global.bimServerApi.call("ServiceInterface", "getProjectByPoid", {poid: othis.navigator.projecttree.selectedNode.poid}, function(project){
+							main.showCheckinPopup(project, function(){
+								Global.bimServerApi.call("ServiceInterface", "getProjectSmallByPoid", {poid: othis.navigator.projecttree.selectedNode.poid}, function(projectSmall){
+									othis.changeRevision(projectSmall, projectSmall.lastRevisionId);
+								});
+							});
+						});
+					}).find("a").prepend("<i class=\"glyphicon glyphicon-cloud-upload\"></i> ");
+					othis.navigator.projecttree.addMenuItem("Bulk checkin...", "btnBulkCheckin", function(){
+						Global.bimServerApi.call("ServiceInterface", "getProjectByPoid", {poid: othis.navigator.projecttree.selectedNode.poid}, function(project){
+							main.showBulkCheckinPopup(project, function(){
+								window.location.reload();
+							});
+						});
+					}).find("a").prepend("<i class=\"glyphicon glyphicon-cloud-upload\"></i> ");
+					othis.navigator.projecttree.addMenuItem("Download...", "btnDownload", function(){
+						var list = [];
+						othis.navigator.projecttree.gatherRoidList(othis.navigator.projecttree.selectedNode, list);
+						main.showDownloadRevisionsPopup(list);
+					}).find("a").prepend("<i class=\"glyphicon glyphicon-cloud-download\"></i> ");
+
+					othis.navigator.projecttree.addMenuDivider("revisionDivider");
+					othis.navigator.projecttree.addMenuItem("Compare...", "btnCompare", function(){
+						var project = othis.navigator.projecttree.selectedNode.project;
+						main.showComparePopup(project.schema, project.lastRevisionId);						
+					}).find("a").prepend("<i class=\"glyphicon glyphicon-random\"></i> ");
+					othis.navigator.projecttree.addMenuDivider("revisionDivider");
+					var regenerateGeometryBtn = othis.navigator.projecttree.addMenuItem("Regenerate geometry", "btnRegenerateGeometry", function(){
+					}, function(){
+					});
+					
+					regenerateGeometryBtn.addClass("dropdown-submenu");
+					regenerateGeometryBtn.find("a").prepend("<i class=\"glyphicon glyphicon-cloud-download\"></i> ");
+					var ul = $("<ul class=\"dropdown-menu\">");
+					regenerateGeometryBtn.append(ul);
+
+					Global.bimServerApi.call("PluginInterface", "getAllRenderEngines", {onlyEnabled: true}, function(engines){
+						engines.forEach(function(engine){
+							var li = $("<li><a>with " + engine.name + "</a></li>");
+							li.find("a").click(function(){
+								var list = [];
+								othis.navigator.projecttree.gatherRoidList(othis.navigator.projecttree.selectedNode, list);
+								
+								$(document.body).find(".regenerategeometry").remove();
+								var div = $("<div>");
+								$(document.body).append(div);
+								
+								var dropdown = containerDiv.find(".dropdown");
+								dropdown.hide();
+								
+								div.load("regenerategeometry.html", function(){
+									new RegenerateGeometry($(this), list, engine);
+									div.find(".modal").modal("show");
+								});
+							});
+							ul.append(li);
+							Global.bimServerApi.call("PluginInterface", "getPluginDescriptor", {oid: engine.pluginDescriptorId}, function(pluginDescriptor){
+								Global.bimServerApi.call("PluginInterface", "getInstalledPluginBundle", {oid: pluginDescriptor.pluginBundleVersionId}, function(pluginBundle){
+									if (pluginBundle.icon != null) {
+										var icon = $("<img style=\"width: 16px; height: 16px\">");
+										icon.attr("src", "data:image/png;base64," + pluginBundle.icon);
+										li.find("a").prepend(" ");
+										li.find("a").prepend(icon);
+									}
+								});
+							});
+						});
+					});
+					
+					promise.chain(othis.loadDetails(othis.project));
+					othis.projects.forEach(function(project){
+						othis.changeRevision(project, project.lastRevisionId);
+					});
+				});
+			});
+		});
+		return promise;
+	};
+
+	this.loadDetails = function(project){
+		var promise = new BimServerApiPromise();
+		this.resize();
+		if (othis.rightPanel != null) {
+			promise.chain(othis.rightPanel.reloadProject(project.oid, project.lastRevisionId));
+		} else {
+			containerDiv.find(".rightCol").load("rightpanel.html", function(){
+				othis.rightPanel = new RightPanel($(this), main, project, othis);
+				if (project.lastRevisionId != -1) {
+					Global.bimServerApi.call("ServiceInterface", "getRevision", {roid: project.lastRevisionId}, function(data){
+						othis.rightPanel.selectedRevision = data;
+						othis.rightPanel.show();
+						containerDiv.find(".rightCol > .details").show();
+						promise.fire();
+					});
+				} else {
+					othis.rightPanel.show();
+					containerDiv.find(".rightCol > .details").show();
+					promise.fire();
+				}
+			});
+		}
+		return promise;
+	};
+	
+	this.share = function(poid, roid) {
+		var div = $("<div class=\"modal fade\">");
+		$(document.body).append(div);
+		div.load(Global.baseDir + "share.html", function(){
+			new Share(poid, roid);
+		}).modal({keyboard:true});
+	};
+}
+</script>

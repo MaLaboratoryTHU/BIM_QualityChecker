@@ -1,0 +1,21 @@
+topologically sorted number of vertices: 
+0,1,
+
+start points: 
+0,
+
+end points: 
+1,0,
+
+map new vertices into origin vertices: 
+
+map object property num into name: 
+0:ifc:objectPlacement_IfcProduct
+1:ifc:placementRelTo_IfcLocalPlacement
+
+edge set: 
+0,1
+
+edge label: 
+0,1,ifc:IfcLocalPlacement
+

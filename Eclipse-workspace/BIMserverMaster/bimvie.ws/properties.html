@@ -1,0 +1,221 @@
+<div class="properties">
+	<div class="spaced modelLoader">
+		No models loaded
+		<button class="btn btn-default btn-xs btnLoad">Load all</button>
+	</div>
+	<table class="table table-no-top">
+		<thead></thead>
+		<tbody>
+		</tbody>
+	</table>
+</div>
+<script>
+function Properties(containerDiv, parent, oid) {
+	var othis = this;
+	othis.selected = null;
+	
+	this.close = function(){};
+	this.loaded = false;
+	
+	this.objectClick = function(){
+		var oid = $(this).data("oid");
+		parent.rightPanel.loadBrowser(function(){
+			this.loadObject(parent.project.oid, oid);
+		}, true);
+	};
+	
+	this.selected = function(origin, groupId, object) {
+		if (othis.selected == object) {
+			return;
+		}
+		othis.selected = object;
+		containerDiv.find("table").hide();
+		containerDiv.find("table tbody tr").remove();
+		if (object != null) {
+			containerDiv.find("table tbody").append("<tr class=\"active\"><td colspan=\"2\"><b>" + object.getType() + "</b></td></tr>");
+			if (object.getName() != null) {
+				containerDiv.find("table tbody").append("<tr><td>Name</td><td>" + object.getName() + "</td></tr>");
+			}
+			if (object.getDescription() != null && object.getDescription() != "") {
+				containerDiv.find("table tbody").append("<tr><td>Description</td><td>" + object.getDescription() + "</td></tr>");
+			}
+			if (object.object._rOwnerHistory != null) {
+				var a = $("<a>Owner History</a>");
+				a.data("oid", object.object._rOwnerHistory);
+				a.click(othis.objectClick);
+				var td = $("<td>");
+				td.append(a);
+				var tr = $("<tr><td>Owner History</td></tr>");
+				tr.append(td);
+				containerDiv.find("table tbody").append(tr);
+			}
+			if (object.getGlobalId() != null) {
+				containerDiv.find("table tbody").append("<tr><td>GUID</td><td>" + object.getGlobalId() + "</td></tr>");
+			}
+			if (object.object._u != null) {
+				containerDiv.find("table tbody").append("<tr><td>UUID (BIMserver)</td><td>" + object.object._u + "</td></tr>");
+			}
+			object.getIsDefinedBy(function(isDefinedBy){
+				if (isDefinedBy.getType() == "IfcRelDefinesByProperties") {
+					isDefinedBy.getRelatingPropertyDefinition(function(propertySet){
+						if (propertySet.getType() == "IfcPropertySet") {
+							containerDiv.find("table tbody tr.noprop").remove();
+							othis.showPropertySet(propertySet);
+						}
+					});
+				}
+			});
+			
+			var headerTr = $("<tr class=\"active\"></tr>");
+			containerDiv.find("table tbody").append(headerTr);
+			var headerTd = $("<td colspan=\"2\"></td>");
+			headerTr.append(headerTd).hide();
+			headerTd.append("<b>Calculated</b>");
+			object.getGeometry(function(geometryInfo){
+				if (geometryInfo != null) {
+					var knownTranslations = {
+						TOTAL_SURFACE_AREA: "Total surface area",
+						TOTAL_SHAPE_VOLUME: "Total shape volume",
+						SURFACE_AREA_ALONG_X: "Surface area along X axis",
+						SURFACE_AREA_ALONG_Y: "Surface area along Y axis",
+						SURFACE_AREA_ALONG_Z: "Surface area along Z axis",
+						WALKABLE_SURFACE_AREA: "Walkable surface area",
+						LARGEST_FACE_AREA: "Largest face area",
+						BOUNDING_BOX_SIZE_ALONG_X: "Bounding box size along X axis",
+						BOUNDING_BOX_SIZE_ALONG_Y: "Bounding box size along Y axis",
+						BOUNDING_BOX_SIZE_ALONG_Z: "Bounding box size along Z axis",
+						LARGEST_FACE_DIRECTION: "Largest face direction"
+					};
+					if (geometryInfo.object.additionalData != null) {
+						var additionalData = JSON.parse(geometryInfo.object.additionalData);
+						for (const key in additionalData) {
+							headerTr.show();
+							const tr = $("<tr></tr>");
+							if (knownTranslations[key] == null) {
+								tr.append("<td>" + key + "</td>");
+							} else {
+								tr.append("<td>" + knownTranslations[key] + "</td>");
+							}
+							const value = additionalData[key];
+							if (value.toFixed == null) {
+								tr.append("<td>" + value + "</td>");
+							} else {
+								tr.append("<td>" + value.toFixed(2) + "</td>");
+							}
+							headerTr.after(tr);
+						}
+					};
+				}
+			});
+			var current = parent.rightPanel.tabChanger.current;
+			if (current != null) {
+				var node = current.viewer.scene.findNode(object.gid);
+				if (node != null) {
+					var geometryInfo = {
+						nrTriangles: 0,
+						nrVertices: 0
+					};
+					othis.processGeometryInfo(node, geometryInfo);
+				}
+			} else {
+				console.log(parent.rightPanel.tabChanger);
+			}
+		} else {
+			if (this.loaded) {
+				containerDiv.find("table tbody").append("<tr class=\"noprop\"><td>No object selected</td></tr>");
+			}
+		}
+		containerDiv.find("table").show();
+	};
+	
+	this.processGeometryInfo = function(node, geometryInfo){
+		if (node.type == "geometry") {
+			if (node._core.indexBuf != null) {
+				geometryInfo.nrTriangles += node._core.indexBuf.length / 3;
+				geometryInfo.nrVertices += node._core.vertexBuf.length / 3;
+			}
+		}
+		node.nodes.forEach(function(subNode){
+			othis.processGeometryInfo(subNode, geometryInfo);
+		});
+	};
+	
+	this.hide = function(){
+		containerDiv.hide();
+	};
+	
+	this.show = function(){
+		containerDiv.show();
+	};
+	
+	this.getSelected = function(){
+		return othis.selected;
+	};
+	
+	this.unselected = function(groupId, id){
+		othis.selected = null;
+		containerDiv.find("table tbody tr").remove();
+		containerDiv.find("table tbody").append("<tr class=\"noprop\"><td>No object selected</td></tr>");
+	};
+	
+	this.showProperty = function (propertySet, property, headerTr){
+		var tr = $("<tr></tr>");
+		tr.attr("oid", property.oid);
+		tr.attr("psetoid", propertySet.oid);
+		headerTr.after(tr);
+		tr.append("<td>" + property.getName() + "</td>");
+		othis.getValue(tr, property);
+	};
+	
+	this.showProperties = function(propertySet, headerTr) {
+		propertySet.getHasProperties(function(property){
+			if (property.getType() == "IfcPropertySingleValue") {
+				othis.showProperty(propertySet, property, headerTr);
+			}
+		});
+	}
+	
+	this.showPropertySet = function(propertySet) {
+		var headerTr = $("<tr class=\"active\"></tr>");
+		headerTr.attr("oid", propertySet.oid);
+		headerTr.attr("uri", propertySet.getName());
+		containerDiv.find("table tbody").append(headerTr);
+		var headerTd = $("<td colspan=\"2\"></td>");
+		headerTr.append(headerTd);
+		headerTd.append("<b>" + propertySet.getName() + "</b>");
+		othis.showProperties(propertySet, headerTr);
+	}
+
+	this.getValue = function(tr, property) {
+		(function (tr) {
+			property.getNominalValue(function(value){
+				var td = $("<td>");
+				var v = value == null ? "" : value._v;
+				var span = $("<span class=\"value nonEditable\">" + v + "</span>");
+				td.append(span);
+				tr.append(td);
+			});
+		} )(tr);
+	}
+	
+	this.loadRevision = function(){
+		containerDiv.find(".modelLoader").hide();
+		containerDiv.find(".noprop").remove();
+		containerDiv.find("table tbody").append("<tr class=\"noprop\"><td>No object selected</td></tr>");
+		this.loaded = true;
+	};
+	
+	this.unloadRevision = function(){};
+
+	parent.selectListeners.register(othis.selected);
+	parent.unselectListeners.register(othis.unselected);
+	parent.modelLoadedListeners.register(othis.loadRevision);
+	parent.modelUnloadedListeners.register(othis.unloadRevision);
+
+	containerDiv.find(".btnLoad").click(parent.loadModel);
+
+	if (othis.selected != null) {
+		othis.selected(othis.selected);
+	}
+}
+</script>

@@ -1,0 +1,35 @@
+
+„	
+NewServicesInterface.protoorg.bimserver.pbServiceInterface.proto""
+ ListAllServiceDescriptorsRequest"ƒ
+SNewServiceDescriptor
+authorizationUrl (	
+description (	
+inputs (	
+name (	
+oid (
+outputs (	
+provider (	
+registerUrl (	
+resourceUrl	 (	
+rid
+ (
+tokenUrl (	$
+uuid (2.org.bimserver.pb.UUID"q
+!ListAllServiceDescriptorsResponse
+errorMessage (	6
+value (2'.org.bimserver.pb.SNewServiceDescriptor"1
+!ListAvailableOutputFormatsRequest
+poid ("­
+SFormatSerializerMap
+format (	
+oid (
+rid (E
+serializers (20.org.bimserver.pb.SSerializerPluginConfiguration$
+uuid (2.org.bimserver.pb.UUID"q
+"ListAvailableOutputFormatsResponse
+errorMessage (	5
+value (2&.org.bimserver.pb.SFormatSerializerMap2§
+NewServicesInterface„
+listAllServiceDescriptors2.org.bimserver.pb.ListAllServiceDescriptorsRequest3.org.bimserver.pb.ListAllServiceDescriptorsResponse‡
+listAvailableOutputFormats3.org.bimserver.pb.ListAvailableOutputFormatsRequest4.org.bimserver.pb.ListAvailableOutputFormatsResponseBBNewServicesInterfaceImplHˆ

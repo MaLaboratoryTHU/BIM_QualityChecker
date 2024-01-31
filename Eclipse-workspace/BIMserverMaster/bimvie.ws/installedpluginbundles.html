@@ -1,0 +1,171 @@
+<div class="installedpluginbundles">
+	<h3>Installed Plugin Bundles <a class="helpBtn" title="Help"><span class="glyphicon glyphicon-question-sign"></span></a></h3>
+	<div class="panel panel-default helpDiv ih">
+  		<div class="panel-body">
+			<p>Only plugin bundles are shown that are installed on this BIMserver. To install new plugins, goto <a class="availablePluginsBtn">Available Plugin Bundles</a>.</p>
+			<p>Plugins are discovered by connecting to a repository, you can change the repository in <a class="btnServerSettings">Server Settings</a></p>
+		</div>
+	</div>
+	<div class="none ih">
+		No plugins have been installed yet
+	</div>
+	<table class="table ih">
+		<thead>
+			<tr>
+				<th></th>
+				<th>Name</th>
+				<th>Organization</th>
+				<th>Installed Version</th>
+				<th>Installed Date/Time</th>
+				<th>Source</th>
+				<th>Description</th>
+				<th>Version</th>
+				<th>Uninstall / Update</th>
+			</tr>
+		</thead>
+		<tbody></tbody>
+	</table>
+</div>
+<script>
+function InstalledPluginBundles(main, serverSettings, cd) {
+	var o = this;
+	
+	this.show = function(){};
+	this.hide = function(){};
+	
+	Global.bimServerApi.callWithFullIndication("PluginInterface", "getInstalledPluginBundles", {}, function(data){
+		cd.find("table tbody tr").remove();
+		if (data.length == 0) {
+			cd.find(".none").show();
+			cd.find(".table").hide();
+		} else {
+			cd.find("table").show();
+		}
+		data.forEach(function(pluginBundle){
+			var tr = $("<tr>");
+			
+			var installed = pluginBundle.installedVersion;
+			var latest = pluginBundle.latestVersion;
+			
+			var iconTd = $("<td class=\"icon\">");
+			var icon = $("<img style=\"width: 16px; height: 16px; display: none\">");
+			if (installed.icon != null) {
+				icon.attr("src", "data:image/png;base64," + installed.icon);
+				icon.show();
+			}
+			iconTd.append(icon);
+			tr.append(iconTd);
+
+			var nameTd = $("<td>");
+			var nameLink = $("<a>" + pluginBundle.name + "</a>");
+			nameLink.click(function(){
+				cd.load("pluginbundle.html", function(){
+					new PluginBundle($(this), serverSettings, pluginBundle);
+				});
+			});
+			nameTd.append(nameLink);
+			
+			tr.append(nameTd);
+			tr.append("<td>" + pluginBundle.organization + "</td>");
+			tr.append("<td class=\"installedVersion\">" + installed.version + "</td>");
+			if (installed.type == "LOCAL") {
+				tr.append("<td class=\"installedDate\">None</td>");
+			} else {
+				tr.append("<td class=\"installedDate\">" + (installed.date == null ? "Unknown" : formatDateTime(new Date(installed.date))) + "</td>");
+			}
+			tr.append("<td class=\"type\">" + installed.type + "</td>");
+			tr.append("<td class=\"description\">" + installed.description + "</td>");
+
+			var versionTd = $("<td>");
+			var versionSelect = $("<select class=\"form-control\">");
+			versionTd.append(versionSelect);
+			pluginBundle.availableVersions.forEach(function(version){
+				var text = version.version;
+				if (installed != null && version.version == installed.version) {
+					text += " (installed)";
+				}
+				if (latest != null && version.version == latest.version) {
+					text += " (latest)";
+				}
+				if (version.mismatch) {
+					text += " (UNTESTED)";
+				}
+				var option = $("<option val=\"" + version.version + "\">" + text + "</option>");
+				versionSelect.append(option);
+				if (version.version == installed.version) {
+					option.attr("selected", "selected");
+				}
+				option.data("version", version);
+			});
+			
+			if (pluginBundle.availableVersions[0].version != installed.version && installed.type == "MAVEN") {
+				nameTd.append(" <span class=\"label label-primary\">Update available</span>");
+			}
+			
+			tr.data("pluginBundle", pluginBundle);
+			if (pluginBundle.latestVersion == null) {
+				tr.data("version", pluginBundle.installedVersion);
+			} else {
+				tr.data("version", pluginBundle.latestVersion);
+			}
+			
+			tr.append(versionTd);
+
+			var actionsTd = $("<td>");
+			var uninstallBtn = $("<button class=\"btn btn-primary\">Uninstall</button>");
+			uninstallBtn.click(function(){
+				var tr = $(this).parents("tr");
+				var pluginBundle = tr.data("pluginBundle");
+				var version = tr.data("version");
+				serverSettings.showUninstallPluginBundle(pluginBundle, version);
+			});
+			actionsTd.append(uninstallBtn);
+			
+			var updateBtn = $("<button class=\"btn btn-primary ih\">Update</button>");
+			updateBtn.click(function(){
+				var tr = $(this).parents("tr");
+				var pluginBundle = tr.data("pluginBundle");
+				var version = tr.data("version");
+				console.log(version);
+				serverSettings.showUpdatePluginBundle(pluginBundle, version);
+			});
+			actionsTd.append(updateBtn);
+
+			versionSelect.change(function(){
+				var selected = $(this).find(":selected");
+				var version = selected.data("version");
+				console.log(version);
+				o.updateRow($(this).parents("tr"), version);
+				if (version.version == installed.version) {
+					updateBtn.hide();
+					uninstallBtn.show();
+				} else {
+					updateBtn.show();
+					uninstallBtn.hide();
+				}
+			});
+			
+			tr.append(actionsTd);
+
+			cd.find("table tbody").append(tr);
+		});
+	});
+	
+	this.updateRow = function(tr, version){
+		tr.data("version", version);
+		tr.find(".description").html(version.description);
+		tr.find(".type").html(version.type);
+		if (version.icon != null) {
+			tr.find(".icon img").attr("src", "data:image/png;base64," + version.icon);
+			tr.find(".icon img").show();
+		}
+	};
+	
+	cd.find(".helpBtn").click(function(){
+		cd.find(".helpDiv").toggle();
+	});
+	
+	cd.find(".availablePluginsBtn").click(serverSettings.showAvailablePluginBundles);
+	cd.find(".btnServerSettings").click(serverSettings.showBasicServerSettings);
+}
+</script>

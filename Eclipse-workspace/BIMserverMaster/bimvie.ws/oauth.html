@@ -1,0 +1,117 @@
+<div class="oauth">
+	<h3>Authorize external application</h3>
+	<p>
+		Hello <span class="user">user</span><br/>
+		An application wants to use your credentials.
+		<div class="well appinfo row">
+			<div class="col-xs-1">
+				<img class="appicon"/>
+			</div>
+			<div class="col-xs-5">
+				<span class="name" style="font-weight: bold"></span>
+				<div class="description"></div>
+			</div>
+		</div>
+	</p>
+	<div class="singleproject ih">
+		<h3>Single Project Access</h3>
+		Select a project
+		<select class="form-control projectsSelect"></select>
+		<button class="btn btn-primary authorizeBtn">Authorize</button>
+	</div>
+	<div class="service ih">
+		<h3>Service Runner Access</h3>
+		
+		<div class="serviceInfo well">
+			<span class="name"></span>
+			<span class="description"></span>
+		</div>
+		
+		Select a service configuration. It's normal that only one configuration is available. You can create extra configurations in <i>User Settings | Internal Services</i>.
+		<div class="row" style="margin-bottom: 10px">
+			<div class="col-xs-4">
+				<select class="form-control servicesSelect"></select>
+			</div>
+		</div>
+		<button class="btn btn-primary authorizeBtn">Authorize</button>
+		<button class="btn btn-default goBackBtn">Go back</button>
+	</div>
+	<br/>
+</div>
+<script>
+function OAuth(cd) {
+	var o = this;
+
+	cd.find(".user").html(Global.bimServerApi.user.name);
+	
+	var authType = QueryString.auth_type;
+	if (authType == "singleproject") {
+		cd.find(".singleproject").show();
+		
+		Global.bimServerApi.call("ServiceInterface", "getAllProjects", {
+			onlyTopLevel: true,
+			onlyActive: true
+		}, function(projects){
+			projects.forEach(function(project){
+				var option = $("<option value=\"" + project.oid + "\">" + project.name + "</option>");
+				cd.find(".projectsSelect").append(option);
+			});
+		});
+	} else if (authType == "service") {
+		var state = QueryString.state;
+		if (Array.isArray(state)) {
+			// Somehow sometimes it's an array with 2 duplicate values
+			state = state[0];
+		}
+		var state = JSON.parse(state);
+		Global.bimServerApi.call("PluginInterface", "getPluginDescriptorByName", {name: state._serviceName}, function(pluginDescriptor){
+			cd.find(".serviceInfo .name").html(pluginDescriptor.name);
+			cd.find(".serviceInfo .description").html(pluginDescriptor.description);
+		});
+		cd.find(".service").show();
+		Global.bimServerApi.call("PluginInterface", "getAllInternalServicesOfService", {
+			name: state._serviceName,
+			onlyEnabled: true
+		}, function(services){
+			services.forEach(function(service){
+				var option = $("<option value=\"" + service.oid + "\">" + service.name + "</option>");
+				cd.find(".servicesSelect").append(option);
+			});
+		});
+	}
+	
+	cd.find(".singleproject .authorizeBtn").click(function(){
+		Global.bimServerApi.call("OAuthInterface", "authorize", {
+			oAuthServerOid: o.oAuthServerOid,
+			authorization: {
+				__type: "SSingleProjectAuthorization",
+				projectId: cd.find(".projectsSelect").val()
+			}
+		}, function(code){
+			window.location = "/oauth/authorize/" + window.location.search + "&token=" + Global.bimServerApi.token + "&code=" + code;
+		});
+	});
+
+	cd.find(".service .authorizeBtn").click(function(){
+		Global.bimServerApi.call("OAuthInterface", "authorize", {
+			oAuthServerOid: o.oAuthServerOid,
+			authorization: {
+				__type: "SRunServiceAuthorization",
+				serviceId: cd.find(".servicesSelect").val()
+			}
+		}, function(code){
+			window.location = "/oauth/authorize/" + window.location.search + "&token=" + Global.bimServerApi.token + "&code=" + code;
+		});
+	});
+	
+	Global.bimServerApi.call("OAuthInterface", "getOAuthServerByClientId", {clientId: QueryString.client_id}, function(data){
+		o.oAuthServerOid = data.oid;
+		cd.find(".appinfo img.appicon").attr("src", "data:image/png;base64," + data.clientIcon);
+		cd.find(".appinfo .name").html(data.clientName);
+		cd.find(".appinfo .description").html(data.clientDescription);
+	});
+	
+	this.show = function(){};
+	this.close = function(){};
+}
+</script>

@@ -1,0 +1,568 @@
+<div class="threedview">
+	<img class="ih screenshot" style="width: 300px"/>
+	<div class="progressbars">
+		<div class="waiting">
+			<span class="badge">3</span><span class="text"> Waiting...</span>
+		</div>
+	</div>
+	<div class="overlay-controls">
+		<div class="buttons">
+			<button class="ih btn btnScreenShot">Screenshot</button>
+			<button class="btn btn-default glyphicon viewbutton glyphicon-resize-full btnResize" title="Show &quot;full screen&quot;"></button>
+			<button class="btn btn-default glyphicon viewbutton glyphicon-wrench btnViewOptions" data-toggle="dropdown" title="Change between triangles/lines"></button>
+		</div>
+		<div class="panel panel-default visualization ih">
+			<div class="panel-heading">
+				<h3 class="panel-title">Visualization options</h3>
+			</div>
+			<div class="panel-body"></div>
+		</div>
+	</div>
+  <div id="viewport"></div>
+	<div class="dropdown viewOptions">
+	  <ul class="dropdown-menu">
+	    <li><a href="#">Action</a></li>
+	    <li><a href="#">Another action</a></li>
+	    <li><a href="#">Something else here</a></li>
+	    <li role="separator" class="divider"></li>
+	    <li><a href="#">Separated link</a></li>
+	  </ul>
+	  </div>
+</div>
+<script>
+function ThreeDView(containerDiv, parent, main) {
+	var o = this;
+	o.selected = null;
+	
+	// IfcProduct.oid -> GeometryInfo.oid
+	o.loadedOids = {};
+	
+	this.load = function(){
+		var promise = new BimServerApiPromise();
+		o.viewer = new BIMSURFER.Viewer(Global.bimServerApi, 'viewport');
+		$(window).resize(o.resize);
+		o.resize();
+		o.viewer.loadScene(function(){
+			Global.scene = o.viewer.scene;
+			var clickSelect = o.viewer.getControl("BIMSURFER.Control.ClickSelect");
+			clickSelect.activate();
+			clickSelect.events.register('select', o.nodeSelected);
+			clickSelect.events.register('unselect', o.nodeUnselected);
+			promise.fire();
+		}, {useCapture: true});
+		return promise;
+	};
+	
+	this.nodeSelected = function(groupId, node){
+		o.selected = node.data.object;
+		parent.selected(o, groupId, node.data.object);
+	};
+	
+	this.nodeUnselected = function(groupId, node){
+		parent.unselected(o, groupId, node.data.object);
+		o.selected = null;
+	};
+	
+	this.selected = function(origin, groupId, object){
+		if (o.selected == object) {
+			return;
+		}
+		o.selected = object;
+		
+		// todo use groupid		
+		var sceneJsNode = o.viewer.scene.findNode(object.gid);
+		if (sceneJsNode != null) {
+			sceneJsNode.nodeId = sceneJsNode.id;
+			o.viewer.getControl("BIMSURFER.Control.ClickSelect").pick(sceneJsNode);
+			
+		}
+	};
+	
+	this.unselected = function(groupId, id){
+		
+	};
+	
+	this.setAlternativeColor = function(object, color){
+		o.updateVisibility(object);
+	};
+	
+	this.unsetAlternativeColor = function(object){
+		var threeDObject = o.viewer.scene.findNode(object.gid);
+		if (threeDObject != null) {
+			var matrix = threeDObject.nodes[0];
+			var geometryNode = matrix.nodes[0];
+			if (geometryNode.coreId != null && ("" + geometryNode.coreId).endsWith("_Visualization")) {
+				// This is a complex-material object which had been modified, return it to the old state
+				if (geometryNode._core.arrays.colors != null) {
+					matrix.removeNode(geometryNode);
+					
+					var newGeometry = {
+						type: "geometry",
+						coreId: geometryNode.getCoreId().replace("_Visualization", "")
+					}
+					
+					matrix.addNode(newGeometry);
+				}
+			} else {
+				o.setObjectColor(object);
+			}
+		}
+	};
+	
+	this.setObjectColor = function(object){
+		var threeDObject = o.viewer.scene.findNode(object.gid);
+		var mode = object.trans.mode;
+		if (threeDObject != null) {
+			var matrix = threeDObject.nodes[0];
+			var geometryNode = matrix.nodes[0];
+			var material = BIMSURFER.Constants.materials[object.getType()];
+			// Hack to get the roof to be red.....
+			if (object.getType() == "IfcSlab") {
+				if (object.getPredefinedType() == "ROOF") {
+					material = BIMSURFER.Constants.materials["IfcRoof"];
+				}
+			}
+			
+			var color = {r: material.r, g: material.g, b: material.b, a: material.a};
+
+			if (mode == 0) {
+				threeDObject.findParentByType("enable").setEnabled(true);
+			} else if (mode == 1) {
+				threeDObject.findParentByType("enable").setEnabled(true);
+				color.a = 0.5;
+				color.r = 0.5;
+				color.g = 0.5;
+				color.b = 0.5;
+				if (o.selectedId == object.oid) {
+					threeDObject.getNode("highlight").set("alpha", 0.5);
+				}
+			} else if (mode == 2) {
+				threeDObject.findParentByType("enable").setEnabled(false);
+			}
+			
+			o.changeColorOfObject(object, color);
+		}
+	};
+	
+	this.changeColorOfObject = function(object, color){
+		var threeDObject = o.viewer.scene.findNode(object.gid);
+		if (threeDObject != null) {
+			var matrix = threeDObject.nodes[0];
+			var geometryNode = matrix.nodes[0];
+			if (geometryNode._core.arrays != null && geometryNode._core.arrays.colors != null) {
+				var groupId = threeDObject.findParentByType("translate").data.groupId;
+				
+				var geometry = {
+					type: "geometry",
+					primitive: "triangles"
+				};
+		
+				geometry.coreId = geometryNode.getCoreId() + "_Visualization";
+				geometry.indices = geometryNode._core.arrays.indices;
+				geometry.positions = geometryNode._core.arrays.positions;
+				geometry.normals = geometryNode._core.arrays.normals;
+				
+				geometry.colors = [];
+				for (var i=0; i<geometryNode._core.arrays.colors.length; i+=4) {
+					geometry.colors[i] = color.r;
+					geometry.colors[i+1] = color.g;
+					geometry.colors[i+2] = color.b;
+					geometry.colors[i+3] = color.a;
+				}
+				
+				var library = o.viewer.scene.findNode("library-" + groupId);
+				library.add("node", geometry);
+				
+				var newGeometry = {
+					type: "geometry",
+					coreId: geometryNode.getCoreId() + "_Visualization"
+				}
+				
+				matrix.removeNode(geometryNode);
+				matrix.addNode(newGeometry);
+			} else {
+				threeDObject.findParentByType("flags").set("flags", {transparent: color.a < 1});
+				threeDObject.parent.set("alpha", color.a);
+				threeDObject.parent.set("baseColor", {r: color.r, g: color.g, b: color.b});
+			}
+		}
+	};
+	
+	this.updateVisibility = function(object) {
+		if (object.gid == null) {
+			return;
+		}
+		var threeDObject = o.viewer.scene.findNode(object.gid);
+		var mode = object.trans.mode;
+		if (threeDObject != null) {
+			var matrix = threeDObject.nodes[0];
+			var geometryNode = matrix.nodes[0];
+			if (geometryNode != null) {
+				if (mode == 0) {
+					threeDObject.findParentByType("enable").setEnabled(true);
+					if (geometryNode._core.arrays != null && geometryNode._core.arrays.colors != null) {
+						if (object.trans.colorOverride != null) {
+							o.changeColorOfObject(object, object.trans.colorOverride);
+						} else {
+							if (geometryNode.coreId != null && ("" + geometryNode.coreId).endsWith("_Visualization")) {
+								// This is a complex-material object which had been modified, return it to the old state
+								if (geometryNode._core.arrays.colors != null) {
+									matrix.removeNode(geometryNode);
+									
+									var newGeometry = {
+										type: "geometry",
+										coreId: geometryNode.getCoreId().replace("_Visualization", "")
+									}
+									
+									matrix.addNode(newGeometry);
+								}
+							}
+						}
+					} else {
+						if (object.trans.colorOverride != null) {
+							o.changeColorOfObject(object, object.trans.colorOverride);
+						} else {
+							var material = BIMSURFER.Constants.materials[object.getType()];
+							// Hack to get the roof to be red.....
+							if (object.getType() == "IfcSlab") {
+								if (object.getPredefinedType() == "ROOF") {
+									material = BIMSURFER.Constants.materials["IfcRoof"];
+								}
+							}
+							if (material == null) {
+								material = BIMSURFER.Constants.materials.DEFAULT;
+							}
+							
+							var color = {r: material.r, g: material.g, b: material.b, a: material.a};
+							o.changeColorOfObject(object, color);
+						}
+					}
+				} else if (mode == 1) {
+					threeDObject.findParentByType("enable").setEnabled(true);
+					var color = {};
+					color.a = 0.5;
+					color.r = 0.5;
+					color.g = 0.5;
+					color.b = 0.5;
+					if (o.selectedId == object.oid) {
+						threeDObject.getNode("highlight").set("alpha", 0.5);
+					}
+					o.changeColorOfObject(object, color);
+				} else if (mode == 2) {
+					threeDObject.findParentByType("enable").setEnabled(false);
+				}
+			}
+		} else {
+			console.log("Object not found: " + object.gid);
+		}
+	};
+	
+	this.objectVisibilityChanged = function(objects){
+		// todo use groupid
+		var uniqueRoids = [];
+		
+		if (!Array.isArray(objects)) {
+			objects = [objects];
+		}
+
+		var oidsNotLoaded = [];
+
+		var count = 0;
+		
+		for (var i=0; i<objects.length; i++) {
+			var object = objects[i];
+			if (i == 0) {
+				// TODO actually do something useful here
+				uniqueRoids.push(object.model.roid);
+			}
+			
+			o.updateVisibility(object);
+			
+			if (o.loadedOids[object.oid] == null) {
+				if (object.isA("IfcProduct")) {
+					if (object.object._rRepresentation != -1 && object.object._rRepresentation != null) {
+						if (Settings.getDefaultHiddenTypes()[object.getType()] == null || object.trans.mode == 0) {
+							if (object.object._rgeometry != null) {
+								if (object.model.objects[object.object._rgeometry] != null) {
+									// Only if this data is preloaded, otherwise just don't include any gi
+									object.getGeometry(function(geometryInfo){
+										oidsNotLoaded.push({gid: object.object._rgeometry._i, oid: object.oid, object: object, info: geometryInfo.object});
+										count++;
+									});
+								} else {
+									oidsNotLoaded.push({gid: object.object._rgeometry._i, oid: object.oid, object: object});
+									count++;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		oidsNotLoaded.sort(function(a, b){
+			if (a.info != null && b.info != null) {
+				var topa = (a.info._emaxBounds.z + a.info._eminBounds.z) / 2;
+				var topb = (b.info._emaxBounds.z + b.info._eminBounds.z) / 2;
+				return topa - topb;
+			} else {
+				// Resort back to type
+				// TODO this is dodgy when some objects do have info, and others don't
+				return a.object.getType().localeCompare(b.object.getType());
+			}
+		});
+		if (count > 0) {
+			var models = {};
+			var lastModel;
+			uniqueRoids.forEach(function(roid){
+				models[roid] = parent.models[roid];
+				lastModel = parent.models[roid];
+			});
+			var geometryType = $.cookie(main.user.oid + "geometrytype");
+			if (geometryType == null) {
+				geometryType = "triangles";
+			}
+			var geometryLoader = new GeometryLoader(Global.bimServerApi, models, o.viewer, geometryType);
+
+			var first = true;
+			var progressdiv = null;
+			
+			var progressbar = null;
+			var text = null;
+			
+			geometryLoader.addProgressListener(function(title, progressPercent){
+				if (first) {
+					progressdiv = $("<div class=\"progressdiv\">");
+					text = $("<div class=\"text\">");
+					text.html("Blaat");
+					var progress = $("<div class=\"progress progress-striped\">");
+					progressbar = $("<div class=\"progress-bar\" style=\"width: 100%\">");
+					progressdiv.append(text)
+					progressdiv.append(progress);
+					progress.append(progressbar);
+					
+					containerDiv.find(".progressbars").append(progressdiv);
+					
+					first = false;
+				}
+				//text.html("Loading... (" + nrObjectsRead + "/" + totalNrObjects + ")");
+				if (title == "done") {
+					progressdiv.fadeOut(400);
+				} else {
+					text.html(title);
+					progressbar.css("width", progressPercent + "%");
+				}
+			});
+			
+			geometryLoader.setLoadOids(uniqueRoids, oidsNotLoaded);
+			geometryLoader.setTitle(lastModel.name);
+			
+			// This might be needed when the geometryloader comes up with more objects than requested...
+			geometryLoader.objectAddedListeners.push(function(oid){
+//				models[uniqueRoids[0]].get(oid, function(object){
+//					o.updateVisibility(object);
+//				});
+				o.loadedOids[oid] = true;
+			});
+//			geometryLoader.progressListeners.push(function(state){
+//				if (state == "done") {
+//					for (var i=0; i<oidsNotLoaded.length; i++) {
+//						o.loadedOids[oidsNotLoaded[i]] = true;
+//					}
+//					o.resize();
+//				}
+//			});
+			o.viewer.loadGeometry(geometryLoader);
+		}
+	};
+
+	this.resize = function(){
+		var resizeBtn = containerDiv.find(".btnResize");
+		var fullscreen = !resizeBtn.hasClass("glyphicon-resize-full");
+		var width = Math.round($(window).width() / 3 * 2 - 29);
+		$(".overlay-controls").css("top", fullscreen ? 10 : 120);
+		var height = ($(window).height() - $(".navbar").outerHeight() - $(".navbar-header").outerHeight() - $(".rightpanel .panel-heading").outerHeight() - 10) + (fullscreen ? 113 : 0);
+		$("div#viewport").width(width + "px");
+		$("div#viewport").height((height - 1) + "px");
+		o.viewer.resize($('div#viewport').width(), $('div#viewport').height());
+	};
+	
+	this.unloadRevision = function(poid, roid) {
+		if (roid != -1) {
+			var node = o.viewer.scene.findNode("model_node_" + roid);
+			if (node != null) {
+				node.destroy();
+				var boundsTranslate = o.viewer.scene.findNode("bounds_translate");
+				if (boundsTranslate.nodes.length == 0) {
+					// If this was the last model, let's clear the bound_translate as well, so we can start with a fresh one after this
+					boundsTranslate.destroy();
+				}
+			}
+		}
+	};
+
+	this.loadRevision = function(project, roid){
+		Global.bimServerApi.registerNewExtendedDataOnRevisionHandler(roid, function(){
+			o.updateVisualisationOverride(roid);
+		}, function(){
+			o.updateVisualisationOverride(roid);
+		});
+	};
+
+	this.updateVisualisationOverride = function(roid){
+		/*
+		This checks whether there are visualization overrides, example:
+		{
+			  "name": "Test",
+			  "changes": [{
+			    "selector": {
+			      "guids": ["16DNNqzfP2thtfaOflvsKA"]
+			   	},
+			    "effect": {
+					"color": {
+					  "r": 0,
+					  "g": 1,
+					  "b": 0,
+					  "a": 1
+					}
+			   	}
+			  }]
+			}
+		*/
+		Global.bimServerApi.callWithNoIndication("ServiceInterface", "getExtendedDataSchemaByName", {name: "VIS_3D_JSON_1_0"}, function(schema){
+			if (schema != null) {
+				var lastExtendedData = null;
+				Global.bimServerApi.call("ServiceInterface", "getAllExtendedDataOfRevision", {roid: roid}, function(list){
+					list.forEach(function(extendedData){
+						if (extendedData.schemaId == schema.oid) {
+							if (lastExtendedData == null || extendedData.added > lastExtendedData.added) {
+								lastExtendedData = extendedData;
+							}
+						}
+					});
+					if (lastExtendedData != null) {
+						Global.bimServerApi.call("ServiceInterface", "getFile", {fileId: lastExtendedData.fileId}, function(file){
+							var data = atob(file.data);
+							var vis = JSON.parse(data);
+							var div = $("<div class=\"checkbox\">");
+							var label = $("<label></label>");
+							div.append(label);
+							var checkbox = $("<input type=\"checkbox\"/>");
+							
+							var change = function(checked){
+								var guids = [];
+								var map = {};
+								vis.changes.forEach(function(change){
+									guids = guids.concat(change.selector.guids);
+									change.selector.guids.forEach(function(guid){
+										map[guid] = change;
+									});
+								});
+								var model = parent.models[roid];
+								var objects = [];
+								model.getByGuids(guids, function(object){
+									var change = map[object.getGlobalId()];
+									if (object.object._rRepresentation != -1 && object.object._rRepresentation != null) {
+										objects.push(object);
+										object.trans.mode = 0;
+										if (checked) {
+											object.trans.colorOverride = change.effect.color;
+										} else {
+											object.trans.colorOverride = null;
+										}
+									}
+									// Go 1 level deep for decomposition, this 1 level is quite arbitrarily chosen, but makes models with IfcAssembly work
+								 	if (object.getIsDecomposedBy != null) { 
+								 		object.getIsDecomposedBy(function(ifcRelAggregates){
+								 			ifcRelAggregates.getRelatedObjects(function(relatedObject){
+												if (relatedObject.object._rRepresentation != -1 && relatedObject.object._rRepresentation != null) {
+													objects.push(relatedObject);
+													relatedObject.trans.mode = 0;
+													if (checked) {
+														relatedObject.trans.colorOverride = change.effect.color;
+													} else {
+														relatedObject.trans.colorOverride = null;
+													}
+												}								 				
+								 			});
+								 		});
+								 	}
+								}).done(function(){
+									o.objectVisibilityChanged(objects);
+								});
+							};
+							
+							checkbox.change(function(){
+								var checked = $(this).is(":checked");
+								change(checked);
+							});
+							label.append(checkbox);
+							label.append(vis.name);
+							containerDiv.find(".visualization").show();
+							containerDiv.find(".visualization .panel-body div").remove();
+							containerDiv.find(".visualization .panel-body").append(div);
+						});
+					}
+				});
+			}
+		});
+	};
+	
+	this.resizeClick = function(){
+		var resizeBtn = containerDiv.find(".btnResize");
+		if (resizeBtn.hasClass("glyphicon-resize-full")) {
+			$(".navbar").hide();
+			$(".panel-heading").hide();
+			resizeBtn.removeClass("glyphicon-resize-full").addClass("glyphicon-resize-small");
+			resizeBtn.attr("title", "Back to normal view");
+		} else {
+			$(".navbar").show();
+			$(".panel-heading").show();
+			resizeBtn.removeClass("glyphicon-resize-small").addClass("glyphicon-resize-full");
+			resizeBtn.attr("title", "Show \"full screen\"");
+		}
+		parent.navigator.resize();
+		o.resize();
+	};
+	
+	this.close = function(){
+//		console.log("close");
+//		parent.selectListeners.unregister(o.selected);
+//		parent.unselectListeners.unregister(o.unselected);
+//		parent.objectVisibilityListeners.unregister(o.objectVisibilityChanged);
+//		parent.modelLoadedListeners.unregister(o.loadRevision);
+//		parent.modelUnloadedListeners.unregister(o.unloadRevision);
+	};
+	
+	this.viewOptionsClick = function(){
+		var geometryType = $.cookie(main.user.oid + "geometrytype");
+		if (geometryType == null) {
+			geometryType = "triangles";
+		}
+		$.cookie(main.user.oid + "geometrytype", geometryType == "lines" ? "triangles" : "lines");
+		alert("Reload for changes to take effect");
+
+//		containerDiv.find(".viewOptions").dropdown("toggle");
+	};
+	
+	containerDiv.find(".waiting").hide();
+
+	parent.selectListeners.register(o.selected);
+	parent.unselectListeners.register(o.unselected);
+	parent.objectVisibilityListeners.register(o.objectVisibilityChanged);
+	parent.modelLoadedListeners.register(o.loadRevision);
+	parent.modelUnloadedListeners.register(o.unloadRevision);
+
+	$("#viewport").on("contextmenu", function(e){
+		e.preventDefault();
+	});
+	
+	$(".btnScreenShot").click(function(){
+		o.viewer.capture().done(function(test){
+			$(".screenshot").attr("src", test.src);
+		});
+	});
+	
+	containerDiv.find(".btnResize").click(o.resizeClick);
+	containerDiv.find(".btnViewOptions").click(o.viewOptionsClick);
+}
+</script>

@@ -1,0 +1,17 @@
+{
+"Wall":"RelatingMaterial,RelatingColour",
+"Slab":"RelatingMaterial,RelatingColour",
+"Floor":"RelatingMaterial,RelatingColour",
+"Footing":"RelatingMaterial,RelatingColour",
+"Beam":"RelatingMaterial,RelatingColour",
+"Railing":"RelatingMaterial,RelatingColour",
+"Stair":"RelatingMaterial,RelatingColour",
+"Ramp":"RelatingMaterial,RelatingColour",
+"Covering":"RelatingMaterial,RelatingColour",
+"Column":"RelatingMaterial,RelatingColour",
+"Roof":"RelatingMaterial,RelatingColour",
+"Door":"RelatingMaterial,RelatingColour,RelatingGeometryItem",
+"Window":"RelatingMaterial,RelatingColour,RelatingGeometryItem",
+
+"Project":"RelatingCoordinateSystem"
+}

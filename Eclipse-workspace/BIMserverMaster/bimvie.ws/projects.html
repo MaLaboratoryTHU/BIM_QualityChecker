@@ -1,0 +1,163 @@
+<div class="projects">
+	<div class="alert alert-info importAlert ih" role="alert alert-dismissible">
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		For a demo of BIMvie.ws/BIMserver, you can now import the freely available <a href="https://github.com/buildingSMART/Sample-Test-Files/tree/master/IFC%202x3/Schependomlaan">Schependomlaan</a> model <a class="importClick">automatically</a>.
+	</div>
+	<div class="alert alert-warning disclaimer" role="alert alert-dismissible">
+		BIMserver is a thoroughly tested framework. It uses several plugins to provide additional functions. The graphical user interface <a href="https://github.com/opensourceBIM/bimvie.ws/wiki">bimvie.ws</a> you are now using is not a part of BIMserver and it's test-cycle, it has many known bugs and we do not advice to use it for any other reason than experimenting with the BIMserver framework.
+	</div>
+	<div class="well well-sm noprojects ih">There are no projects yet, click on <b>Project</b> | <b>New project</b> to create a new project</div>
+	<table id="projectsTable" class="projectsTable table table-hover initialhide">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Sub Projects</th>
+				<th>Revisions</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+</div>
+<script>
+function Projects(containerDiv, main) {
+	var othis = this;
+	
+	this.projectClick = function(event) {
+		if (!$(event.target).is("a, button, span.caret")) {
+			main.showProject($(this).parents("tr").andSelf().data("project").oid, null, true);
+			othis.close();
+		}
+	};
+
+	this.close = function() {
+		Global.bimServerApi.unregisterNewProjectHandler(othis.newProjectHandler);
+	};
+
+	this.show = function() {
+		Global.bimServerApi.registerNewProjectHandler(othis.newProjectHandler);
+	};
+	
+	this.deleteProject = function(project){
+		Global.bimServerApi.callWithFullIndication("ServiceInterface", "deleteProject", {poid: project.oid}, function(){
+			othis.loadProjects();
+		});
+	};
+
+	this.undeleteProject = function(project){
+		Global.bimServerApi.callWithFullIndication("ServiceInterface", "undeleteProject", {poid: project.oid}, function(){
+			othis.loadProjects();
+		});
+	};
+	
+	this.addProject = function(project) {
+		$(".projects .projectsTable").show();
+		$(".projects .noprojects").hide();
+		var projectRow = $("<tr>");
+		projectRow.attr("poid", project.oid);
+		projectRow.data("project", project);
+		projectRow.click(othis.projectClick);
+
+		var indent = 0;
+		
+		if (project.parentId != -1 && project.parentId != null) {
+			var parentRow = $(".projectsTable [poid=" + project.parentId + "]");
+			if (parentRow.length > 0) {
+				indent = parseInt(parentRow.attr("indent")) + 1;
+			}
+		}
+		
+		projectRow.attr("indent", indent);
+
+		var add = "";
+		for (var i=0; i<indent; i++) {
+			add += "&nbsp;&nbsp;&nbsp;&nbsp;";
+		}
+		if (indent == 0) {
+			add += "<b>" + project.name + "</b>";
+		} else {
+			add += project.name;
+		}
+		projectRow.append("<td>" + add + "</td>");
+
+		projectRow.append("<td>" + project.nrSubProjects+ "</td>");
+		projectRow.append("<td>" + project.nrRevisions + "</td>");
+		var actions = newDropdownTd("Actions");
+
+		actions.find(".dropdown-toggle").click(function(){
+			actions.find("ul li").remove();
+			var project = $(this).parents("tr").data("project");
+			if (project.state == "ACTIVE") {
+				var li = $("<li><a>Delete</a></li>");
+				li.find("a").click(function(){othis.deleteProject(project)});
+				actions.find("ul").append(li);
+			} else {
+				var li = $("<li><a>Undelete</a></li>");
+				li.find("a").click(function(){othis.undeleteProject(project)});
+				actions.find("ul").append(li);
+			}
+		});
+
+		if (project.hasCheckinRights) {
+			projectRow.addClass("success");
+		} else {
+			projectRow.addClass("warning");
+		}
+		
+		projectRow.append(actions);
+
+		$("#projectsTable").append(projectRow);
+		
+		if ((project.state == "DELETED" || (parentRow != null && parentRow.is(":hidden"))) && $.cookie(main.user.oid + "showdeleteditems") != "true") {
+			projectRow.hide();
+		}
+	};
+	
+	this.loadProjects = function(){
+		Global.bimServerApi.callWithNoIndication("SettingsInterface", "isAllowUsersToCreateTopLevelProjects", {}, function(enabled){
+			if (main.user.userType == "ADMIN" || enabled) {
+				$(".buttonBar").show();
+				$(".addProjectButton").show();
+			}
+		});
+		
+		$(".projectsTable tbody tr").remove();
+		Global.bimServerApi.callWithNoIndication("ServiceInterface", "getAllProjectsSmall", {}, function(data){
+			data.forEach(function(project){
+				$(".projectsTable").show();
+				othis.addProject(project);
+			});
+			if (data.length == 0) {
+				$(".noprojects").show();
+			}
+		});
+	};
+	
+	this.newProjectHandler = function(poid){
+		Global.bimServerApi.callWithNoIndication("ServiceInterface", "getProjectSmallByPoid", {poid: poid}, function(data){
+			othis.addProject(data);
+		});
+	};
+	
+	$(".importClick").click(function(){
+		var div = $("<div>");
+		$(document.body).append(div);
+		div.load(Global.baseDir + "import.html", function(){
+			new Import($(this), main);
+			div.find(".modal").modal("show");
+		});
+	});
+	$(".addProjectButton").click(function(){main.showAddProject()});
+
+	$(".importAlert").on('closed.bs.alert', function () {
+		$.cookie(main.user.oid + "importalert", false);
+	});
+	
+	if ($.cookie(main.user.oid + "importalert") == null || $.cookie(main.user.oid + "importalert") == "true") {
+		$(".importAlert").show();
+	}
+	
+	othis.loadProjects();
+}
+</script>

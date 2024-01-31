@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<state>
+  <java target="platform:/resource/bimserver/generated/org/bimserver/tools/generators/AdaptorGenerator.java">
+    <template source="platform:/resource/bimserver/templates/AdaptorGenerator.jet"/>
+  </java>
+  <java target="platform:/resource/bimserver/generated/org/bimserver/tools/generators/AsyncServiceGenerator.java">
+    <template source="platform:/resource/bimserver/templates/AsyncServiceGenerator.jet"/>
+  </java>
+  <java target="platform:/resource/bimserver/generated/org/bimserver/tools/generators/SConverterGenerator.java">
+    <template source="platform:/resource/bimserver/templates/SConverterGenerator.jet"/>
+  </java>
+  <java target="platform:/resource/bimserver/generated/org/bimserver/tools/generators/ServiceInterfaceObjectGenerator.java">
+    <template source="platform:/resource/bimserver/templates/SDataObjectGenerator.jet"/>
+  </java>
+  <java target="platform:/resource/bimserver/generated/org/bimserver/tools/generators/SPackageGenerator.java">
+    <template source="platform:/resource/bimserver/templates/SPackageGenerator.jet"/>
+  </java>
+  <java target="platform:/resource/bimserver/generated/org/bimserver/tools/generators/SServiceGenerator.java">
+    <template source="platform:/resource/bimserver/templates/SServiceGenerator.jet"/>
+  </java>
+</state>

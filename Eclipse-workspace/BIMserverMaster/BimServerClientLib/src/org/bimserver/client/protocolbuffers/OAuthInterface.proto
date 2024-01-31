@@ -1,0 +1,247 @@
+package org.bimserver.pb;
+
+/******************************************************************************
+ * Copyright (C) 2009-2019  BIMserver.org
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see {@literal<http://www.gnu.org/licenses/>}.
+ *****************************************************************************/
+import "ServiceInterface.proto";
+import "NewServicesInterface.proto";
+import "AdminInterface.proto";
+import "MetaInterface.proto";
+import "SettingsInterface.proto";
+import "AuthInterface.proto";
+import "PluginInterface.proto";
+import "NotificationInterface.proto";
+import "RemoteServiceInterface.proto";
+import "LowLevelInterface.proto";
+import "NotificationRegistryInterface.proto";
+option java_generic_services = true;
+
+option java_outer_classname = "OAuthInterfaceImpl";
+
+option optimize_for = SPEED;
+
+service OAuthInterface {
+	rpc authorize (AuthorizeRequest) returns (AuthorizeResponse);
+
+	rpc generateForwardUrl (GenerateForwardUrlRequest) returns (GenerateForwardUrlResponse);
+
+	rpc getAuthorizationById (GetAuthorizationByIdRequest) returns (GetAuthorizationByIdResponse);
+
+	rpc getOAuthServerByClientId (GetOAuthServerByClientIdRequest) returns (GetOAuthServerByClientIdResponse);
+
+	rpc getOAuthServerById (GetOAuthServerByIdRequest) returns (GetOAuthServerByIdResponse);
+
+	rpc getRemoteToken (GetRemoteTokenRequest) returns (GetRemoteTokenResponse);
+
+	rpc listAuthorizationCodes (ListAuthorizationCodesRequest) returns (ListAuthorizationCodesResponse);
+
+	rpc listIssuedAuthorizationCodes (ListIssuedAuthorizationCodesRequest) returns (ListIssuedAuthorizationCodesResponse);
+
+	rpc listRegisteredServers (ListRegisteredServersRequest) returns (ListRegisteredServersResponse);
+
+	rpc listRegisteredServersLocal (ListRegisteredServersLocalRequest) returns (ListRegisteredServersLocalResponse);
+
+	rpc registerApplication (RegisterApplicationRequest) returns (RegisterApplicationResponse);
+
+	rpc registerRemoteApplication (RegisterRemoteApplicationRequest) returns (RegisterRemoteApplicationResponse);
+
+	rpc revokeApplication (RevokeApplicationRequest) returns (VoidResponse);
+
+	rpc revokeAuthorization (RevokeAuthorizationRequest) returns (VoidResponse);
+
+	rpc setAuthorizationCode (SetAuthorizationCodeRequest) returns (VoidResponse);
+
+}
+
+message SRunServiceAuthorization {
+	optional int64 oid = 1;
+	optional int32 rid = 2;
+	optional int64 serviceId = 3;
+	optional UUID uuid = 4;
+}
+
+message SSingleProjectAuthorization {
+	optional int64 oid = 1;
+	optional int64 projectId = 2;
+	optional int32 rid = 3;
+	optional UUID uuid = 4;
+}
+
+message SAuthorization {
+	required string __actual_type = 1;
+	optional SRunServiceAuthorization __SRunServiceAuthorization = 2;
+	optional SSingleProjectAuthorization __SSingleProjectAuthorization = 3;
+	optional int64 oid = 4;
+	optional int32 rid = 5;
+	optional UUID uuid = 6;
+}
+
+message AuthorizeRequest {
+	optional int64 oAuthServerOid = 1;
+	optional SAuthorization authorization = 2;
+}
+
+message AuthorizeResponse {
+	optional string errorMessage = 1;
+	optional string value = 2;
+}
+
+message GenerateForwardUrlRequest {
+	optional string registrationEndpoint = 1;
+	optional string authorizeUrl = 2;
+	optional string returnUrl = 3;
+}
+
+message GenerateForwardUrlResponse {
+	optional string errorMessage = 1;
+	optional string value = 2;
+}
+
+message GetAuthorizationByIdRequest {
+	optional int64 oid = 1;
+}
+
+message GetAuthorizationByIdResponse {
+	optional string errorMessage = 1;
+	optional SAuthorization value = 2;
+}
+
+message GetOAuthServerByClientIdRequest {
+	optional string clientId = 1;
+}
+
+message SOAuthServer {
+	optional string apiUrl = 1;
+	optional string clientDescription = 2;
+	optional bytes clientIcon = 3;
+	optional string clientId = 4;
+	optional string clientName = 5;
+	optional string clientSecret = 6;
+	optional string clientUrl = 7;
+	optional int64 expiresAt = 8;
+	optional bool incoming = 9;
+	optional int64 issuedAt = 10;
+	optional int64 oid = 11;
+	optional string redirectUrl = 12;
+	optional string registrationEndpoint = 13;
+	optional string registrationUrl = 14;
+	optional int32 rid = 15;
+	optional UUID uuid = 16;
+}
+
+message GetOAuthServerByClientIdResponse {
+	optional string errorMessage = 1;
+	optional SOAuthServer value = 2;
+}
+
+message GetOAuthServerByIdRequest {
+	optional int64 oid = 1;
+}
+
+message GetOAuthServerByIdResponse {
+	optional string errorMessage = 1;
+	optional SOAuthServer value = 2;
+}
+
+message GetRemoteTokenRequest {
+	optional int64 soid = 1;
+	optional string code = 2;
+	optional int64 serverId = 3;
+}
+
+message GetRemoteTokenResponse {
+	optional string errorMessage = 1;
+	optional string value = 2;
+}
+
+message ListAuthorizationCodesRequest {
+}
+
+message SOAuthAuthorizationCode {
+	optional int64 authorizationId = 1;
+	optional string code = 2;
+	optional int64 issued = 3;
+	optional int64 oauthServerId = 4;
+	optional int64 oid = 5;
+	optional int32 rid = 6;
+	optional int64 userId = 7;
+	optional UUID uuid = 8;
+}
+
+message ListAuthorizationCodesResponse {
+	optional string errorMessage = 1;
+	repeated SOAuthAuthorizationCode value = 2;
+}
+
+message ListIssuedAuthorizationCodesRequest {
+}
+
+message ListIssuedAuthorizationCodesResponse {
+	optional string errorMessage = 1;
+	repeated SOAuthAuthorizationCode value = 2;
+}
+
+message ListRegisteredServersRequest {
+}
+
+message ListRegisteredServersResponse {
+	optional string errorMessage = 1;
+	repeated SOAuthServer value = 2;
+}
+
+message ListRegisteredServersLocalRequest {
+}
+
+message ListRegisteredServersLocalResponse {
+	optional string errorMessage = 1;
+	repeated SOAuthServer value = 2;
+}
+
+message RegisterApplicationRequest {
+	optional string registrationEndpoint = 1;
+	optional string apiUrl = 2;
+	optional string redirectUrl = 3;
+}
+
+message RegisterApplicationResponse {
+	optional string errorMessage = 1;
+	optional int64 value = 2;
+}
+
+message RegisterRemoteApplicationRequest {
+	optional string redirectUrl = 1;
+	optional string name = 2;
+	optional string description = 3;
+}
+
+message RegisterRemoteApplicationResponse {
+	optional string errorMessage = 1;
+	optional SOAuthServer value = 2;
+}
+
+message RevokeApplicationRequest {
+	optional int64 oid = 1;
+}
+
+message RevokeAuthorizationRequest {
+	optional int64 oid = 1;
+}
+
+message SetAuthorizationCodeRequest {
+	optional int64 applicationId = 1;
+	optional string code = 2;
+}
+
