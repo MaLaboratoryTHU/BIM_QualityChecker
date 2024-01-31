@@ -1,2 +1,0 @@
-# BIM_QualityChecker
-
